@@ -1,8 +1,0 @@
-run_erl [45138] Tue Jan 20 16:58:43 2015
-Args before exec of shell:
-run_erl [45138] Tue Jan 20 16:58:43 2015
-argv[0] = sh
-run_erl [45138] Tue Jan 20 16:58:43 2015
-argv[1] = -c
-run_erl [45138] Tue Jan 20 16:58:43 2015
-argv[2] = exec "/Users/uyounri/Software/projects/subpub-repo/subpub-publish-proto.erlang/_rel/publish_proto/bin/publish_proto" "console"

@@ -7,5 +7,7 @@
               {mod,{publish_proto_app,[]}},
               {modules,[publish_proto_app,publish_proto_publish,
                         publish_proto_publish_sup,
-                        publish_proto_publisher_worker,publish_proto_sup]},
+                        publish_proto_publisher_worker,
+                        publish_proto_subscriber,publish_proto_subscriber_sup,
+                        publish_proto_sup]},
               {env,[]}]}.
