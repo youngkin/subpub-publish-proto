@@ -1,0 +1,43 @@
+## Disable kernel poll
++K true 
+
+## Maximum number of processes. Why is this only 10K?
++P 10000  
+
+## Number of concurrent ports/sockets
+-env ERL_MAX_PORTS 10000
+
+## Needed? Or provided by relx?
+## -boot start_sasl
+## -pa ebin
+
+## Name of the node
+##-sname publish_proto
+-name publish_proto@richsmac.ecollege-dev.com
+
+## Name/Location of the app.config file
+## Deprecated in favor of the relx generated sys.config file
+## -config dev
+
+## Start lager
+## Deprecated in favor of application:ensure_start_all?
+## -s lager
+##  -OR-
+## -eval "application:ensure_start_all"
+
+## Needed?
+## -s pe_app go
+
+## Cookie for distributed erlang
+-setcookie COOKIE
+
+## Mnesia directory (TODO: CHANGE THIS!!!!!)
+-mnesia dir "/var/data/prospero"
+
+## Heartbeat management; auto-restarts VM if it dies or becomes unresponsive
+## (Disabled by default..use with caution!)
+##-heart
+
+## Tweak GC to run more often
+## Replacement for pe_collect?
+##-env ERL_FULLSWEEP_AFTER 10

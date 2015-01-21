@@ -1,0 +1,20 @@
+{application, publish_proto,
+ [
+  {description, "Prototype app that simply publishes messages to RabbitMQ."},
+  {vsn, "0.1.0"},
+  {registered, []},
+  {applications, [
+                  kernel,
+                  stdlib,
+                  sasl,
+                  compiler,
+                  syntax_tools,
+                  goldrush,
+                  lager,
+                  lexical_uuid
+                 ]},
+  {mod, { publish_proto_app, []}},
+  %% {modules, []} is needed to make relx happy
+  {modules, []},
+  {env, []}
+ ]}.

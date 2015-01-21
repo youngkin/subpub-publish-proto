@@ -1,0 +1,11 @@
+{application,publish_proto,
+             [{description,"Prototype app that simply publishes messages to RabbitMQ."},
+              {vsn,"0.1.0"},
+              {registered,[]},
+              {applications,[kernel,stdlib,sasl,compiler,syntax_tools,
+                             goldrush,lager,lexical_uuid]},
+              {mod,{publish_proto_app,[]}},
+              {modules,[publish_proto_app,publish_proto_publish,
+                        publish_proto_publish_sup,
+                        publish_proto_publisher_worker,publish_proto_sup]},
+              {env,[]}]}.

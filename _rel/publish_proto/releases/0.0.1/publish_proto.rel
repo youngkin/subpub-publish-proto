@@ -1,0 +1,13 @@
+{release,{"publish_proto","0.0.1"},
+         {erts,"6.1"},
+         [{kernel,"3.0.1"},
+          {stdlib,"2.1"},
+          {sasl,"2.4"},
+          {compiler,"5.0.1"},
+          {syntax_tools,"1.6.15"},
+          {lexical_uuid,"TAG-2013-10-22-259-gc503900"},
+          {goldrush,"0.1.5"},
+          {lager,"2.0.1"},
+          {publish_proto,"0.1.0"},
+          {amqp_client,"2.7.1",load},
+          {rabbit_common,"2.7.1",load}]}. 
