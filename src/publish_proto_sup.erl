@@ -41,4 +41,5 @@ init([]) ->
 
   PublisherSupervisor = ?CHILD(publish_proto_publish_sup, supervisor),
   SubscriberSupervisor = ?CHILD(publish_proto_subscriber_sup, supervisor),
-  {ok, {SupervisorStrategy, [PublisherSupervisor, SubscriberSupervisor]}}.
+  TestDriver = ?CHILD(publish_proto_test_driver, worker),
+  {ok, {SupervisorStrategy, [PublisherSupervisor, SubscriberSupervisor, TestDriver]}}.

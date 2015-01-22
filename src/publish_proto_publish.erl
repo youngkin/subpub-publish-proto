@@ -31,8 +31,8 @@
 -export([publish_message/0]).
 
 publish_message() ->
-  lager:info("publish_proto_publish:publish_message()"),
-  gen_server:call(?MODULE, start_publishing).
+%%   lager:info("publish_proto_publish:publish_message()"),
+  gen_server:call(?MODULE, publish_message).
 
 %% ====================================================================
 %% gen_server callbacks
@@ -42,11 +42,10 @@ start_link() ->
   gen_server:start_link({local, ?SERVER}, ?MODULE, [], []).
 
 init([]) ->
-  lager:info("Started publish_proto_publish"),
+  lager:info("Started publish_proto_publish gen_server"),
   {ok, #state{}}.
 
-handle_call(start_publishing, _From, State) ->
-  lager:info("Begin publishing"),
+handle_call(publish_message, _From, State) ->
   publish_proto_publisher_worker:publish_message(),
   {reply, ok, State};
 handle_call(Request, _From, State) ->
