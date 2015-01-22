@@ -39,7 +39,9 @@ start_link() ->
 
 init([]) ->
   lager:info("Started publish_proto_publish gen_server"),
-  {ok, Connection} = amqp_connection:start(#amqp_params_network{host="192.168.56.31"}),
+  RabbitHost = publish_proto_config:get(local_broker_address),
+%%   {ok, Connection} = amqp_connection:start(#amqp_params_network{host=RabbitHost}),
+  {ok, Connection} = amqp_connection:start(#amqp_params_network{host=RabbitHost}),
   {ok, Channel} = amqp_connection:open_channel(Connection),
   BasicQos = #'basic.qos'{prefetch_size = 0, prefetch_count = 3, global = false},
   #'basic.qos_ok'{} = amqp_channel:call(Channel, BasicQos),

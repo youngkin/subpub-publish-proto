@@ -51,7 +51,9 @@ start_link() ->
 
 init([]) ->
   %% Start a network connection and  open channel
-  {ok, Connection} = amqp_connection:start(#amqp_params_network{host="192.168.56.31"}),
+  RabbitHost = publish_proto_config:get(local_broker_address),
+%%   {ok, Connection} = amqp_connection:start(#amqp_params_network{host=RabbitHost}),
+  {ok, Connection} = amqp_connection:start(#amqp_params_network{host=RabbitHost}),
   {ok, Channel} = amqp_connection:open_channel(Connection),
   {ok, #state{connection = Connection, channel = Channel, queue_name = <<"">>}}.
 

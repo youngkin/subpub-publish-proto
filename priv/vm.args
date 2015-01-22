@@ -7,6 +7,9 @@
 ## Number of concurrent ports/sockets
 -env ERL_MAX_PORTS 10000
 
+## Enable SMP
+-smp
+
 ## Needed? Or provided by relx?
 ## -boot start_sasl
 ## -pa ebin
@@ -30,9 +33,6 @@
 
 ## Cookie for distributed erlang
 -setcookie COOKIE
-
-## Mnesia directory (TODO: CHANGE THIS!!!!!)
--mnesia dir "/var/data/prospero"
 
 ## Heartbeat management; auto-restarts VM if it dies or becomes unresponsive
 ## (Disabled by default..use with caution!)
