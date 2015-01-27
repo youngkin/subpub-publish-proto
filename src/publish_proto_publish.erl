@@ -61,7 +61,8 @@ handle_info(Info, State) ->
   {noreply, State}.
 
 terminate(_Reason, _State) ->
-  init:stop().
+  lager:info("TERMINATING for Reason ~p", [_Reason]),
+  ok.
 
 code_change(_OldVsn, State, _Extra) ->
   {ok, State}.

@@ -1,0 +1,9 @@
+<component name="libraryTable">
+  <library name="rabbit-common">
+    <CLASSES>
+      <root url="file://$PROJECT_DIR$/deps/erlang/rabbit_common-2.7.1/ebin" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

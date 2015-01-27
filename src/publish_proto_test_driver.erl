@@ -33,13 +33,15 @@
 -export([start_test/0, stop_test/0]).
 
 start_test() ->
-  publish_proto_subscriber:subscribe(),
+  publish_proto_subscriber_pool:start(),
+  timer:sleep(100), % give subscribers a chance to register before starting publisher
   gen_server:cast(?MODULE, start_test),
   ok.
 
 stop_test() ->
   gen_server:call(?MODULE, stop_test),
-  publish_proto_subscriber:unsubscribe(),
+  timer:sleep(1000), % give publisher a chance to stop before stopping subs
+  publish_proto_subscriber_pool:stop(),
   ok.
 
 start_link() ->
@@ -56,17 +58,18 @@ init([]) ->
 %% handle_call
 %%
 handle_call(stop_test, _From, #state{test_pid = TestPid} = _State) ->
-  lager:info("STOPPING TEST"),
-  exit(TestPid, ok),
+  exit(TestPid, kill),
+  lager:info("STOPPED TEST"),
   {reply, ok, #state{test_pid = <<"">>}};
 handle_call(_Request, _From, State) ->
+  lager:info("Unexpected Request ~p", [_Request]),
   {reply, ok, State}.
 
 %%
 %% handle_cast
 %%
 handle_cast(start_test, _State) ->
-  Pid = spawn(fun run_test/0),
+  Pid = spawn_link(fun run_test/0),
   lager:info("Starting test: PID = ~p", [Pid]),
   {noreply, #state{test_pid = Pid}};
 handle_cast(_Request, State) ->
@@ -78,7 +81,8 @@ handle_cast(_Request, State) ->
 handle_info(_Info, State) ->
   {noreply, State}.
 
-terminate(_Reason, _State) ->
+terminate(Reason, _State) ->
+  lager:info("TERMINATING for Reason: ~p", [Reason]),
   ok.
 
 code_change(_OldVsn, State, _Extra) ->
@@ -90,6 +94,6 @@ code_change(_OldVsn, State, _Extra) ->
 
 run_test() ->
 %%   timer:sleep(1),
-  publish_proto_publish:publish_message(),
+  publish_proto_publisher_worker:publish_message(),
   run_test().
   

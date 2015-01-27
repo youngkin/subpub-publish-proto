@@ -1,1 +1,6 @@
 *.beam
+deps/goldrush
+deps/lager
+.rebar
+_rel/*
+ebin/*

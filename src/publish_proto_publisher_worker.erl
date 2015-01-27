@@ -19,15 +19,16 @@
 
 -define(SERVER, ?MODULE).
 
--record(state, {connection, channel, exchange_name}).
+-record(state, {connection, channel, exchange_name, interval_start, pub_times_list}).
 
 %% ====================================================================
 %% API functions
 %% ====================================================================
--export([publish_message/0]).
+-export([publish_message/0, calc_publish_time_median/1]).
 
 publish_message() ->
-  gen_server:call(?MODULE, publish_message),
+  TimeoutMillis = 1000, %% Testing for amqp_channel:call taking a very long (20000), or very short (1000), time
+  gen_server:call(?MODULE, publish_message, TimeoutMillis),
   ok.
 
 %% ====================================================================
@@ -38,7 +39,7 @@ start_link() ->
   gen_server:start_link({local, ?SERVER}, ?MODULE, [], []).
 
 init([]) ->
-  lager:info("Started publish_proto_publish gen_server"),
+  lager:info("Started"),
   RabbitHost = publish_proto_config:get(local_broker_address),
 %%   {ok, Connection} = amqp_connection:start(#amqp_params_network{host=RabbitHost}),
   {ok, Connection} = amqp_connection:start(#amqp_params_network{host=RabbitHost}),
@@ -54,15 +55,36 @@ init([]) ->
   %% Add a blocked handler, consider return handler too
   amqp_channel:register_return_handler(Channel, self()),
 %%   amqp_connection:register_blocked_handler(Channel, self()),
-  {ok, #state{connection = Connection, channel = Channel, exchange_name = ExchangeNameBin}}.
+  {ok, #state{connection = Connection, channel = Channel, exchange_name = ExchangeNameBin, 
+              interval_start = now(), pub_times_list = []}}.
 
 %%
 %% handle_call
 %%
 handle_call(publish_message, _From,
-    #state{channel = Channel, connection = _Connection, exchange_name = ExchangeName} = State) ->
+    #state{channel = Channel, connection = _Connection, exchange_name = ExchangeName,
+            interval_start = IntStart, pub_times_list = PubTimesList} = _State) ->
+  Before = now(),
   publish(Channel, ExchangeName),
-  {reply, ok, State};
+  After = now(),
+  PubTimeMillis = timer:now_diff(After, Before) / 1000, % convert from microsecs to millisecs
+  HowLongSinceStatsLogged = timer:now_diff(Before, IntStart),
+  NewState = case HowLongSinceStatsLogged of
+               N when N > 5000000 -> %% log stats if more than 5 seconds has passed since the last time stats were logged
+                 NewPubTimesList = [PubTimeMillis | PubTimesList],
+                 AvgPubTime = calc_publish_time_avg(NewPubTimesList),
+                 MedianPubTime = calc_publish_time_median(NewPubTimesList),
+                 MinPubTime = lists:min(NewPubTimesList),
+                 MaxPubTime = lists:max(NewPubTimesList),
+                 lager:info("Publish interval stats: Min = ~p, Max = ~p, Median = ~p, Avg = ~p", 
+                   [MinPubTime, MaxPubTime, MedianPubTime, AvgPubTime]),
+                 #state{channel = Channel, connection = _Connection, exchange_name = ExchangeName,
+                   interval_start = now(), pub_times_list = []};
+               _ ->
+                 #state{channel = Channel, connection = _Connection, exchange_name = ExchangeName,
+                   interval_start = IntStart, pub_times_list = [PubTimeMillis | PubTimesList]}
+             end,
+  {reply, ok, NewState};
 handle_call(Request, _From, State) ->
   lager:warning("Unknown call: ~p; State: ~p", [Request, State]),
   {reply, ok, State}.
@@ -94,7 +116,7 @@ handle_info(Info, State) ->
 terminate(_Reason, #state{channel = Channel, connection = Connection, exchange_name = _} = _State) ->
   amqp_channel:close(Channel),
   amqp_connection:close(Connection),
-  lager:error("publish_proto_publisher_worker: TERMINATED"),
+  lager:info("TERMINATING for Reason ~p", [_Reason]),
   ok.
 
 code_change(_OldVsn, State, _Extra) ->
@@ -105,8 +127,7 @@ code_change(_OldVsn, State, _Extra) ->
 %% ====================================================================
 
 publish(Channel, ExchangeName) ->
-  %% Get Headers from config?
-  Headers = [{<<"MessageType">>, binary, <<"Some.Msg.Type">>}, {<<"SubSystem">>, binary, <<"Pegasus">>}, {<<"x-match">>, longstr, <<"all">>}],
+  Headers = publish_proto_config:get(header),
   MessageId = list_to_binary("00000d01-7b32-ab5a-71c6-d86aeffe0b40"),
   Payload = <<"foobar">>,
 %%   lager:info("MESSAGE: msg=~p; Headers=~p; Payload=~p", [MessageId, Headers, Payload]),
@@ -115,3 +136,22 @@ publish(Channel, ExchangeName) ->
     #amqp_msg{payload = Payload, props = #'P_basic'{headers = Headers, correlation_id = MessageId, delivery_mode=2 }}),
   {ok, Channel}.
 
+calc_publish_time_avg(PubTimesList) ->
+  Sum = lists:sum(PubTimesList),
+  _Avg = Sum / length(PubTimesList).
+
+calc_publish_time_median(PubTimesList) ->
+  SortedList = lists:sort(PubTimesList),
+  Len = length(SortedList),
+  Median = case (Len rem 2) of
+    0 -> 
+      MedianPosition = round(Len / 2),
+      {List1, List2} = lists:split(MedianPosition, SortedList),
+      Num1 = lists:last(List1),
+      [Num2 | _] = List2,
+      (Num1 + Num2) / 2;
+    _ -> 
+      MedianPosition = round(Len / 2),
+      lists:nth(MedianPosition, SortedList)
+  end,
+  Median.

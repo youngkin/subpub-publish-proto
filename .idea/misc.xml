@@ -42,8 +42,8 @@
   <component name="ProjectModuleManager">
     <modules />
   </component>
-  <component name="ProjectRootManager" version="2" languageLevel="JDK_1_6" assert-keyword="true" jdk-15="true" project-jdk-name="Erlang R16B03" project-jdk-type="Erlang SDK">
-    <output url="file://$PROJECT_DIR$/out" />
+  <component name="ProjectRootManager" version="2" languageLevel="JDK_1_6" assert-keyword="true" jdk-15="true" project-jdk-name="Erlang 17.1_1" project-jdk-type="Erlang SDK">
+    <output url="file://$PROJECT_DIR$/ebin" />
   </component>
   <component name="PropertiesComponent">
     <property name="GoToClass.includeLibraries" value="false" />

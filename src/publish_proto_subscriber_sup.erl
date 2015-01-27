@@ -1,6 +1,6 @@
 %%%-------------------------------------------------------------------
 %%% @author uyounri
-%%% @copyright (C) 2015, <COMPANY>
+%%% @copyright (C) 2015, NCS Pearson
 %%% @doc
 %%%
 %%% @end
@@ -20,7 +20,7 @@
 -define(SERVER, ?MODULE).
 
 %% Helper macro for declaring children of supervisor
--define(CHILD(I, Type), {I, {I, start_link, []}, permanent, 5000, Type, [I]}).
+-define(CHILD(Mod, Type), {Mod, {Mod, start_link, []}, permanent, 5000, Type, [Mod]}).
 
 
 %%%===================================================================
@@ -35,16 +35,11 @@ start_link() ->
 %%%===================================================================
 
 init([]) ->
-  RestartStrategy = rest_for_one,
+  RestartStrategy = one_for_one,
   MaxRestarts = 5,
   MaxRestartSeconds = 10,
   SupervisorFlags = {RestartStrategy, MaxRestarts, MaxRestartSeconds},
-
-  Subscriber = ?CHILD('publish_proto_subscriber', worker),
-
-  {ok, {SupervisorFlags, [Subscriber]}}.
+  SubPool = ?CHILD(publish_proto_subscriber_pool, worker),
+  {ok, {SupervisorFlags, [SubPool]}}.
 
 
-%%%===================================================================
-%%% Internal functions
-%%%===================================================================
