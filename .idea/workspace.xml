@@ -2,28 +2,15 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="abc265b6-f9c8-4e05-a0ec-a198bbd297bf" name="Default" comment="">
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/.idea/libraries/amqp_client.xml" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/priv/pub_proto.config" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/publisher_proto_subscriber_worker.erl" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/.idea/libraries/rabbit_common.xml" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/priv/delivery.wsdl" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/priv/principal.sgte" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/priv/principals_export.sgte" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/priv/subscription.sgte" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/priv/subscriptions_export.sgte" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/priv/tag.sgte" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/priv/tags_export.sgte" afterPath="" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/src/publish_proto_subscriber.erl" afterPath="$PROJECT_DIR$/src/publish_proto_subscriber_pool.erl" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.gitignore" afterPath="$PROJECT_DIR$/.gitignore" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/compiler.xml" afterPath="$PROJECT_DIR$/.idea/compiler.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/misc.xml" afterPath="$PROJECT_DIR$/.idea/misc.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/publish_proto_config.erl" afterPath="$PROJECT_DIR$/src/publish_proto_config.erl" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/deps/goldrush" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/deps/lager" afterPath="" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Makefile" afterPath="$PROJECT_DIR$/Makefile" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/modules.xml" afterPath="$PROJECT_DIR$/.idea/modules.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/priv/pub_proto.config" afterPath="$PROJECT_DIR$/priv/pub_proto.config" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/publish_proto_publish.erl" afterPath="$PROJECT_DIR$/src/publish_proto_publish.erl" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/publish_proto_publisher_worker.erl" afterPath="$PROJECT_DIR$/src/publish_proto_publisher_worker.erl" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/publish_proto_subscriber_sup.erl" afterPath="$PROJECT_DIR$/src/publish_proto_subscriber_sup.erl" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/publish_proto_test_driver.erl" afterPath="$PROJECT_DIR$/src/publish_proto_test_driver.erl" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/rebar.config" afterPath="$PROJECT_DIR$/rebar.config" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/relx.config" afterPath="$PROJECT_DIR$/relx.config" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/subpub-publish-proto.erlang.iml" afterPath="$PROJECT_DIR$/subpub-publish-proto.erlang.iml" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
     </list>
     <ignored path="subpub-publish-proto.erlang.iws" />
@@ -38,6 +25,9 @@
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
   <component name="ChangesViewManager" flattened_view="true" show_ignored="false" />
+  <component name="CompilerWorkspaceConfiguration">
+    <option name="CLEAR_OUTPUT_DIRECTORY" value="false" />
+  </component>
   <component name="CreatePatchCommitExecutor">
     <option name="PATCH_PATH" value="" />
   </component>
@@ -50,61 +40,11 @@
   </component>
   <component name="FileEditorManager">
     <leaf>
-      <file leaf-file-name="publish_proto_publisher_worker.erl" pinned="false" current-in-tab="false">
+      <file leaf-file-name="publish_proto_publisher_worker.erl" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/publish_proto_publisher_worker.erl">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="2445">
-              <caret line="31" column="5" selection-start-line="31" selection-start-column="5" selection-end-line="31" selection-end-column="5" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="sys.config" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/_rel/publish_proto/releases/0.0.1/sys.config">
-          <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="225">
-              <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="relx.config" pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/relx.config">
-          <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.397351" vertical-offset="0" max-vertical-offset="1035">
-              <caret line="20" column="30" selection-start-line="20" selection-start-column="30" selection-end-line="20" selection-end-column="30" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="publish_proto_publish.erl" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/publish_proto_publish.erl">
-          <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0" vertical-offset="331" max-vertical-offset="1125">
-              <caret line="29" column="0" selection-start-line="29" selection-start-column="0" selection-end-line="29" selection-end-column="0" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="publish_proto_subscriber_pool.erl" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/publish_proto_subscriber_pool.erl">
-          <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0" vertical-offset="720" max-vertical-offset="1815">
-              <caret line="54" column="2" selection-start-line="54" selection-start-column="2" selection-end-line="54" selection-end-column="2" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="publish_proto_test_driver.erl" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/publish_proto_test_driver.erl">
-          <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0" vertical-offset="330" max-vertical-offset="1560">
-              <caret line="60" column="20" selection-start-line="60" selection-start-column="20" selection-end-line="60" selection-end-column="20" />
+            <state vertical-scroll-proportion="-0.70696723" vertical-offset="1920" max-vertical-offset="2490">
+              <caret line="105" column="56" selection-start-line="105" selection-start-column="56" selection-end-line="105" selection-end-column="56" />
               <folding />
             </state>
           </provider>
@@ -113,18 +53,28 @@
       <file leaf-file-name="publisher_proto_subscriber_worker.erl" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/publisher_proto_subscriber_worker.erl">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0" vertical-offset="195" max-vertical-offset="1695">
+            <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="1695">
               <caret line="68" column="40" selection-start-line="68" selection-start-column="40" selection-end-line="68" selection-end-column="40" />
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="publish_proto_config.erl" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/publish_proto_config.erl">
+      <file leaf-file-name="publish_proto_subscriber_pool.erl" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/publish_proto_subscriber_pool.erl">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="1245">
-              <caret line="35" column="54" selection-start-line="35" selection-start-column="54" selection-end-line="35" selection-end-column="54" />
+            <state vertical-scroll-proportion="0.0" vertical-offset="796" max-vertical-offset="1815">
+              <caret line="76" column="14" selection-start-line="76" selection-start-column="14" selection-end-line="76" selection-end-column="14" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="publish_proto_test_driver.erl" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/publish_proto_test_driver.erl">
+          <provider selected="true" editor-type-id="text-editor">
+            <state vertical-scroll-proportion="0.0" vertical-offset="768" max-vertical-offset="1560">
+              <caret line="60" column="20" selection-start-line="60" selection-start-column="20" selection-end-line="60" selection-end-column="20" />
               <folding />
             </state>
           </provider>
@@ -141,9 +91,6 @@
         <option value="$PROJECT_DIR$/src/publish_proto_msgs.erl" />
         <option value="$PROJECT_DIR$/src/test.erl" />
         <option value="$PROJECT_DIR$/src/publish_proto_app.erl" />
-        <option value="$PROJECT_DIR$/src/publish_proto_publish_sup.erl" />
-        <option value="$PROJECT_DIR$/rebar.config" />
-        <option value="$PROJECT_DIR$/Makefile" />
         <option value="$PROJECT_DIR$/src/publish_proto_sup.erl" />
         <option value="$PROJECT_DIR$/priv/vm.args" />
         <option value="$PROJECT_DIR$/src/publish_proto_subscriber.erl" />
@@ -151,13 +98,18 @@
         <option value="$PROJECT_DIR$/src/publish_proto_subscriber_worker.erl" />
         <option value="$PROJECT_DIR$/src/publish_proto_subscriber_sup.erl" />
         <option value="$PROJECT_DIR$/dev.config" />
-        <option value="$PROJECT_DIR$/src/publish_proto_publish.erl" />
         <option value="$PROJECT_DIR$/src/publish_proto_subscriber_pool.erl" />
         <option value="$PROJECT_DIR$/src/publisher_proto_subscriber_worker.erl" />
         <option value="$PROJECT_DIR$/src/publish_proto_config.erl" />
         <option value="$PROJECT_DIR$/src/publish_proto_test_driver.erl" />
-        <option value="$PROJECT_DIR$/src/publish_proto_publisher_worker.erl" />
+        <option value="$PROJECT_DIR$/priv/pub_proto.config" />
+        <option value="$PROJECT_DIR$/Makefile" />
+        <option value="$PROJECT_DIR$/src/deletethis.erl" />
+        <option value="$PROJECT_DIR$/src/publish_proto_publish.erl" />
         <option value="$PROJECT_DIR$/relx.config" />
+        <option value="$PROJECT_DIR$/rebar.config" />
+        <option value="$PROJECT_DIR$/src/publish_proto_publish_sup.erl" />
+        <option value="$PROJECT_DIR$/src/publish_proto_publisher_worker.erl" />
       </list>
     </option>
   </component>
@@ -168,8 +120,8 @@
     <treeState />
   </component>
   <component name="ProjectFrameBounds">
-    <option name="x" value="552" />
-    <option name="y" value="59" />
+    <option name="x" value="542" />
+    <option name="y" value="22" />
     <option name="width" value="1348" />
     <option name="height" value="878" />
   </component>
@@ -238,7 +190,7 @@
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
             <PATH_ELEMENT>
-              <option name="myItemId" value="priv" />
+              <option name="myItemId" value="deps" />
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
           </PATH>
@@ -252,41 +204,11 @@
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
             <PATH_ELEMENT>
-              <option name="myItemId" value="_rel" />
+              <option name="myItemId" value="deps" />
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
             <PATH_ELEMENT>
-              <option name="myItemId" value="publish_proto" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="releases" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-          </PATH>
-          <PATH>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="subpub-publish-proto.erlang" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="subpub-publish-proto.erlang" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="_rel" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="publish_proto" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="releases" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="0.0.1" />
+              <option name="myItemId" value="erlang" />
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
           </PATH>
@@ -329,7 +251,7 @@
     <property name="project.structure.last.edited" value="Modules" />
     <property name="project.structure.proportion" value="0.15" />
     <property name="project.structure.side.proportion" value="0.2" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$/deps/erlang/rabbit_common-2.7.1/ebin" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/deps/erlang/amqp_client-2.7.1" />
     <property name="recentsLimit" value="5" />
     <property name="restartRequiresConfirmation" value="true" />
   </component>
@@ -520,12 +442,12 @@
     <servers />
   </component>
   <component name="ToolWindowManager">
-    <frame x="552" y="59" width="1348" height="878" extended-state="0" />
-    <editor active="true" />
+    <frame x="542" y="22" width="1348" height="878" extended-state="0" />
+    <editor active="false" />
     <layout>
       <window_info id="Palette&#9;" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Designer" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
-      <window_info id="Changes" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.30095038" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
+      <window_info id="Changes" active="true" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.34099618" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.26504752" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.3295099" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
@@ -533,13 +455,13 @@
       <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.4" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="true" content_ui="tabs" />
       <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.24966262" sideWeight="0.5" order="2" side_tool="true" content_ui="tabs" />
-      <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32991013" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
+      <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32950193" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32946146" sideWeight="0.5" order="-1" side_tool="false" content_ui="tabs" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
-      <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.2672282" sideWeight="0.5019157" order="1" side_tool="true" content_ui="tabs" />
+      <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.2672282" sideWeight="0.501938" order="1" side_tool="true" content_ui="tabs" />
       <window_info id="Maven Projects" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32967892" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Application Servers" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
-      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.2672282" sideWeight="0.49808428" order="3" side_tool="false" content_ui="combo" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.2672282" sideWeight="0.498062" order="3" side_tool="false" content_ui="combo" />
       <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32946146" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
       <window_info id="Message" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
@@ -566,6 +488,8 @@
     <ignored-roots>
       <path value="$PROJECT_DIR$/deps/lager" />
       <path value="$PROJECT_DIR$/deps/goldrush" />
+      <path value="$PROJECT_DIR$/deps/worker_pool" />
+      <path value="$PROJECT_DIR$/deps/eper" />
     </ignored-roots>
     <MESSAGE value="Added configuration support (e.g., RabbitMQ server address); added SMP support to vm.args; modified relx.config to include required applications for Erlang Observer." />
     <option name="LAST_COMMIT_MESSAGE" value="Added configuration support (e.g., RabbitMQ server address); added SMP support to vm.args; modified relx.config to include required applications for Erlang Observer." />
@@ -749,14 +673,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/Makefile">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.3318584" vertical-offset="0" max-vertical-offset="904">
-          <caret line="20" column="4" selection-start-line="20" selection-start-column="4" selection-end-line="20" selection-end-column="4" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/deps/erlang/amqp_client-2.7.1/include/amqp_client.hrl">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="1200">
@@ -781,28 +697,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/publish_proto_subscriber_worker.erl.ORIG">
-      <provider editor-type-id="com.intellij.database.editor.CsvTableFileEditorProvider">
-        <state />
-      </provider>
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="-0.79302585" vertical-offset="705" max-vertical-offset="2055">
-          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/publish_proto_subscriber_sup.erl.ORIG">
-      <provider editor-type-id="com.intellij.database.editor.CsvTableFileEditorProvider">
-        <state />
-      </provider>
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="1335">
-          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/publish_proto_sup.erl">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0" vertical-offset="14" max-vertical-offset="765">
@@ -819,25 +713,9 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/publish_proto_app.erl">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="510">
-          <caret line="18" column="26" selection-start-line="18" selection-start-column="26" selection-end-line="18" selection-end-column="26" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/publish_proto.app.src">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="728">
-          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/priv/pub_proto.config">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="751">
           <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
           <folding />
         </state>
@@ -851,22 +729,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/rebar.config">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.23968042" vertical-offset="0" max-vertical-offset="751">
-          <caret line="12" column="21" selection-start-line="12" selection-start-column="21" selection-end-line="12" selection-end-column="21" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/publish_proto_publish_sup.erl">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="179" max-vertical-offset="930">
-          <caret line="42" column="11" selection-start-line="42" selection-start-column="11" selection-end-line="42" selection-end-column="11" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/publish_proto_subscriber_sup.erl">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.21970706" vertical-offset="0" max-vertical-offset="765">
@@ -875,66 +737,128 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/src/publish_proto_test_driver.erl">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="768" max-vertical-offset="1560">
+          <caret line="60" column="20" selection-start-line="60" selection-start-column="20" selection-end-line="60" selection-end-column="20" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/publish_proto_app.erl">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="510">
+          <caret line="18" column="26" selection-start-line="18" selection-start-column="26" selection-end-line="18" selection-end-column="26" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/src/publish_proto_config.erl">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="1245">
+        <state vertical-scroll-proportion="0.09090909" vertical-offset="453" max-vertical-offset="1245">
           <caret line="35" column="54" selection-start-line="35" selection-start-column="54" selection-end-line="35" selection-end-column="54" />
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/publisher_proto_subscriber_worker.erl">
+    <entry file="file://$PROJECT_DIR$/src/publish_proto_subscriber_worker.erl.ORIG">
+      <provider editor-type-id="com.intellij.database.editor.CsvTableFileEditorProvider">
+        <state />
+      </provider>
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="195" max-vertical-offset="1695">
-          <caret line="68" column="40" selection-start-line="68" selection-start-column="40" selection-end-line="68" selection-end-column="40" />
+        <state vertical-scroll-proportion="-0.19685039" vertical-offset="150" max-vertical-offset="2055">
+          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/publish_proto_subscriber_sup.erl.ORIG">
+      <provider editor-type-id="com.intellij.database.editor.CsvTableFileEditorProvider">
+        <state />
+      </provider>
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.38976377" vertical-offset="483" max-vertical-offset="1335">
+          <caret line="52" column="59" selection-start-line="52" selection-start-column="28" selection-end-line="52" selection-end-column="59" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/publish_proto_publish_sup.erl">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.28030303" vertical-offset="138" max-vertical-offset="930">
+          <caret line="24" column="38" selection-start-line="24" selection-start-column="38" selection-end-line="24" selection-end-column="38" />
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/publish_proto_subscriber_pool.erl">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="720" max-vertical-offset="1815">
-          <caret line="54" column="2" selection-start-line="54" selection-start-column="2" selection-end-line="54" selection-end-column="2" />
+        <state vertical-scroll-proportion="0.0" vertical-offset="811" max-vertical-offset="1815">
+          <caret line="76" column="14" selection-start-line="76" selection-start-column="14" selection-end-line="76" selection-end-column="14" />
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/publish_proto_test_driver.erl">
+    <entry file="file://$PROJECT_DIR$/Makefile">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="330" max-vertical-offset="1560">
-          <caret line="60" column="20" selection-start-line="60" selection-start-column="20" selection-end-line="60" selection-end-column="20" />
+        <state vertical-scroll-proportion="0.30737704" vertical-offset="0" max-vertical-offset="488">
+          <caret line="10" column="23" selection-start-line="10" selection-start-column="23" selection-end-line="10" selection-end-column="23" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/.idea/modules.xml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="488">
+          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/priv/pub_proto.config">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.13934426" vertical-offset="37" max-vertical-offset="750">
+          <caret line="7" column="31" selection-start-line="7" selection-start-column="31" selection-end-line="7" selection-end-column="31" />
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/publish_proto_publish.erl">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="226" max-vertical-offset="1125">
-          <caret line="29" column="0" selection-start-line="29" selection-start-column="0" selection-end-line="29" selection-end-column="0" />
+        <state vertical-scroll-proportion="0.17008197" vertical-offset="682" max-vertical-offset="1170">
+          <caret line="51" column="0" selection-start-line="51" selection-start-column="0" selection-end-line="51" selection-end-column="0" />
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/publish_proto_publisher_worker.erl">
+    <entry file="file://$PROJECT_DIR$/src/publisher_proto_subscriber_worker.erl">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="2445">
-          <caret line="31" column="5" selection-start-line="31" selection-start-column="5" selection-end-line="31" selection-end-column="5" />
+        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="1695">
+          <caret line="68" column="40" selection-start-line="68" selection-start-column="40" selection-end-line="68" selection-end-column="40" />
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/_rel/publish_proto/releases/0.0.1/sys.config">
+    <entry file="file://$PROJECT_DIR$/rebar.config">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="755">
-          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+        <state vertical-scroll-proportion="0.18442623" vertical-offset="0" max-vertical-offset="488">
+          <caret line="6" column="0" selection-start-line="6" selection-start-column="0" selection-end-line="6" selection-end-column="0" />
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/relx.config">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.397351" vertical-offset="0" max-vertical-offset="1035">
-          <caret line="20" column="30" selection-start-line="20" selection-start-column="30" selection-end-line="20" selection-end-column="30" />
+        <state vertical-scroll-proportion="0.75409836" vertical-offset="577" max-vertical-offset="1065">
+          <caret line="63" column="0" selection-start-line="61" selection-start-column="0" selection-end-line="63" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/publish_proto_publisher_worker.erl">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="-0.70696723" vertical-offset="1920" max-vertical-offset="2490">
+          <caret line="105" column="56" selection-start-line="105" selection-start-column="56" selection-end-line="105" selection-end-column="56" />
           <folding />
         </state>
       </provider>
@@ -996,6 +920,7 @@
             <option name="proportions">
               <list>
                 <option value="0.2" />
+                <option value="0.6" />
               </list>
             </option>
           </splitter-proportions>

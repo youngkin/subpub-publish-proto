@@ -27,7 +27,7 @@
 -export([publish_message/0, calc_publish_time_median/1]).
 
 publish_message() ->
-  TimeoutMillis = 1000, %% Testing for amqp_channel:call taking a very long (20000), or very short (1000), time
+  TimeoutMillis = 20000, %% Testing for amqp_channel:call taking a very long (20000), or very short (1000), time
   gen_server:call(?MODULE, publish_message, TimeoutMillis),
   ok.
 
@@ -102,6 +102,9 @@ handle_cast(Request, State) ->
 handle_info({#'basic.return'{reply_code=312}, #amqp_msg{props = #'P_basic'{correlation_id=MessageIdBin}}}, State) ->
   lager:info("MESSAGE-DISCARDED-NO-SUBSCRIBER: MsgId: ~p", [MessageIdBin]),
   {noreply, State};
+%%
+%% These callbacks aren't supported by amqp_client-2.7.1
+%%
 %% handle_info({#'connection.blocked'{}}, _State) ->
 %%   lager:info("RabbitMQ CONNECTION BLOCKED!!!!"),
 %%   {noreply, _State};

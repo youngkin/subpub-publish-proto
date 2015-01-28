@@ -8,11 +8,14 @@ RELX=./relx
 
 $(if $(ERLANG_BIN),,$(warning "Warning: No Erlang found in your path, this will probably fail"))
 
-all:	clean compile release
+all:	clean get_deps compile release
 
 clean:
 	rm -rf _rel
 	$(REBAR) clean
+
+get_deps:
+	$(REBAR) get-deps
 
 compile:
 	$(REBAR) compile

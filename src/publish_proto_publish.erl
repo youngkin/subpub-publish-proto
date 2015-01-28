@@ -43,10 +43,13 @@ start_link() ->
 
 init([]) ->
   lager:info("Started publish_proto_publish gen_server"),
+%%   wpool:start_pool(publisher_pool,
+%%     [{workers, 10}, {worker, {publish_proto_publisher_worker, []}}]),
   {ok, #state{}}.
 
 handle_call(publish_message, _From, State) ->
   publish_proto_publisher_worker:publish_message(),
+%%   wpool:call(publisher_pool, publish_message),
   {reply, ok, State};
 handle_call(Request, _From, State) ->
   lager:warning("Unknown call: ~p", [Request]),

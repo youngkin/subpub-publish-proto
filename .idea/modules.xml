@@ -3,6 +3,7 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/subpub-publish-proto.erlang.iml" filepath="$PROJECT_DIR$/subpub-publish-proto.erlang.iml" />
+      <module fileurl="file://$PROJECT_DIR$/deps/worker_pool/worker_pool.iml" filepath="$PROJECT_DIR$/deps/worker_pool/worker_pool.iml" />
     </modules>
   </component>
 </project>
