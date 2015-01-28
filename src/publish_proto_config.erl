@@ -16,6 +16,7 @@ get(Key) ->
   case Key of
     local_broker_address -> "192.168.56.31"; % RabbitMQ on local VM
     remote_broker_address -> "10.199.22.69"; % subpubpf-ramq-0002 in usw2a
+    publishing_pool_size -> 5;
     headers ->  [
       [{<<"MessageType">>, binary, <<"Some.Msg.Type">>}, {<<"x-match">>, longstr, <<"all">>}],
 

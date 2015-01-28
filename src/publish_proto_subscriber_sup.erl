@@ -1,7 +1,7 @@
 %%%-------------------------------------------------------------------
 %%% @author uyounri
-%%% @copyright (C) 2015, NCS Pearson
-%%% @doc
+%%% @copyright (C) 2015, Richard Youngkin
+%%% @doc  Supervises the subscriber pool.
 %%%
 %%% @end
 %%% Created : 20. Jan 2015 7:42 PM

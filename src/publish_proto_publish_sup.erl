@@ -1,7 +1,8 @@
 %%%-------------------------------------------------------------------
 %%% @author uyounri
-%%% @copyright (C) 2015, <COMPANY>
-%%% @doc
+%%% @copyright (C) 2015, Richard Youngkin
+%%% @doc  Manages the gen_server which manages the pool of publishing
+%%%       workers.
 %%%
 %%% @end
 %%% Created : 19. Jan 2015 9:44 AM
@@ -46,10 +47,8 @@ init([]) ->
   MaxRestartSeconds = 10,
   SupervisorStrategy = {RestartStrategy, MaxRestarts, MaxRestartSeconds},
   
-  Publisher = ?CHILD(publish_proto_publish, worker),
-  PublishWorker = ?CHILD(publish_proto_publisher_worker, worker),
-
-  {ok, {SupervisorStrategy, [Publisher, PublishWorker]}}.
+  PublishingPool = ?CHILD(publish_proto_publish_pool, worker),
+  {ok, {SupervisorStrategy, [PublishingPool]}}.
 
 %%%===================================================================
 %%% Internal functions

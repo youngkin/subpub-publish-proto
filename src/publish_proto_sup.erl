@@ -1,7 +1,8 @@
 %%%-------------------------------------------------------------------
 %%% @author uyounri
-%%% @copyright (C) 2015, <COMPANY>
-%%% @doc
+%%% @copyright (C) 2015, Richard Youngkin
+%%% @doc  This is the top level application supervisor. It manages
+%%        the supervisors that manage publishing and subscribing.
 %%%
 %%% @end
 %%% Created : 19. Jan 2015 9:44 AM

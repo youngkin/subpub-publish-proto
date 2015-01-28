@@ -1,6 +1,6 @@
 %%%-------------------------------------------------------------------
 %%% @author uyounri
-%%% @copyright (C) 2015, NCS Pearson
+%%% @copyright (C) 2015, Richard Youngkin
 %%% @doc
 %%%
 %%% @end

@@ -1,7 +1,18 @@
 %%%-------------------------------------------------------------------
 %%% @author uyounri
-%%% @copyright (C) 2015, NCS Pearson
-%%% @doc
+%%% @copyright (C) 2015, Richard Youngkin
+%%% @doc  A subscriber that is a member of the subscriber pool. The
+%%%       receive loop (loup_garou, bad geek joke) handles starting
+%%%       and stopping subscribing (including the creation and deletion
+%%%       of subscriptions). It also handles the RabbitMQ callbacks for
+%%%       confirmation of a subscription creation (basic.consume_ok), 
+%%%       subscription cancellation (basic.cancel), and message delivery
+%%%       (basic.deliver).
+%%%
+%%%       The internal functions are helpers that support subscription
+%%%       creation and deletion (creating connections and channels
+%%%       that are used for defining the exchange and binding queues
+%%%       to the exchange).
 %%%
 %%% @end
 %%% Created : 23. Jan 2015 2:26 PM
@@ -76,19 +87,36 @@ get_rabbit_conn_and_channel() ->
   {ok, Channel} = amqp_connection:open_channel(Connection),
   {Connection, Channel}.
 
+%%%
+%%% Defines quality-of-service parameters for the associated Channel.
+%%%
 basic_qos_declare(Channel) ->
   BasicQos = #'basic.qos'{prefetch_size = 0, prefetch_count = 3, global = false},
   #'basic.qos_ok'{} = amqp_channel:call(Channel, BasicQos).
 
+%%%
+%%% Registers the callback process for the provided queue and channel. This is needed
+%%% in order for RabbitMQ to send messages to this process for the various callback
+%%% events such as 'basic.deliver' in this process's receive loop.
+%%%
 subscription_declare(QueueNameBin, Channel) ->
   BasicConsume = #'basic.consume'{queue = QueueNameBin, consumer_tag = <<"">>, no_ack = false},
   #'basic.consume_ok'{consumer_tag = _SubscriptionTag} = amqp_channel:subscribe(Channel, BasicConsume, self()).
 
+%%%
+%%% Defines the queue binding parameters (i.e., the headers) for a given
+%%% exchange and queue. This is used by Rabbit to associate the queue with
+%%% the matching headers, if any, on a published message.
+%%%
 queue_bind(QueueNameBin, ExchangeNameBin, Channel, Headers) ->
   %% Get Headers from config?
   QueueBind = #'queue.bind'{queue = QueueNameBin, exchange = ExchangeNameBin, arguments = Headers},
   #'queue.bind_ok'{} = amqp_channel:call(Channel, QueueBind).
 
+%%%
+%%% Registers a name for queue that will be used later to bind headers for the queue
+%%% and declare the callback process (this one) for message delivery.
+%%%
 queue_declare(Channel) ->
 %%   QueueName = "publish_proto_queue",
   Prefix = "pub_proto_",
@@ -98,6 +126,10 @@ queue_declare(Channel) ->
   #'queue.declare_ok'{queue = _QueueId} = amqp_channel:call(Channel, QueueDeclare),
   QueueNameBin.
 
+%%%
+%%% Declares the RabbitMQ exchange (creating it if necessary) that is associated with
+%%% the queue that this that this subscriber listens to .
+%%%
 exchange_declare(Channel) ->
   ExchangeName = "publish_proto_exchange",
   ExchangeNameBin = list_to_binary(ExchangeName),

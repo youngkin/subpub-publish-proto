@@ -1,7 +1,13 @@
 %%%-------------------------------------------------------------------
 %%% @author uyounri
-%%% @copyright (C) 2015, NCS Pearson
-%%% @doc
+%%% @copyright (C) 2015, Rich Youngkin
+%%% @doc  This module drives the publish/subscribe test via the start_test/0
+%%%       and stop_test/0 functions. The private function run_test/0 
+%%%       performs the actual publishing.
+%%%
+%%%       The test involves subscriber and publisher pools which handle
+%%%       the actual interactions with RabbitMQ. They could be used
+%%%       independently from this test_driver.
 %%%
 %%% @end
 %%% Created : 21. Jan 2015 2:37 PM
@@ -33,15 +39,11 @@
 -export([start_test/0, stop_test/0]).
 
 start_test() ->
-  publish_proto_subscriber_pool:start(),
-  timer:sleep(100), % give subscribers a chance to register before starting publisher
   gen_server:cast(?MODULE, start_test),
   ok.
 
 stop_test() ->
   gen_server:call(?MODULE, stop_test),
-  timer:sleep(1000), % give publisher a chance to stop before stopping subs
-  publish_proto_subscriber_pool:stop(),
   ok.
 
 start_link() ->
@@ -59,6 +61,8 @@ init([]) ->
 %%
 handle_call(stop_test, _From, #state{test_pid = TestPid} = _State) ->
   exit(TestPid, kill),
+  timer:sleep(1000), % give publisher a chance to stop before stopping subs
+  publish_proto_subscriber_pool:stop(),
   lager:info("STOPPED TEST"),
   {reply, ok, #state{test_pid = <<"">>}};
 handle_call(_Request, _From, State) ->
@@ -69,6 +73,8 @@ handle_call(_Request, _From, State) ->
 %% handle_cast
 %%
 handle_cast(start_test, _State) ->
+  publish_proto_subscriber_pool:start(),
+  timer:sleep(100), % give subscribers a chance to register before starting publisher
   Pid = spawn_link(fun run_test/0),
   lager:info("Starting test: PID = ~p", [Pid]),
   {noreply, #state{test_pid = Pid}};
@@ -93,7 +99,7 @@ code_change(_OldVsn, State, _Extra) ->
 %%%===================================================================
 
 run_test() ->
-%%   timer:sleep(1),
-  publish_proto_publisher_worker:publish_message(),
+%%   TODO: add a configurable sleep interval between message publishing?
+  publish_proto_publish_pool:publish_message(),
   run_test().
   

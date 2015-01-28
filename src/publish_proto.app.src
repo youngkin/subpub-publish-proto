@@ -3,6 +3,11 @@
   {description, "Prototype app that simply publishes messages to RabbitMQ."},
   {vsn, "0.1.0"},
   {registered, []},
+   %% Not sure, but the ordering in the app list in the applications tuple is
+   %% not necessarily the order that the apps are actually started in.
+   %% I think relx addresses this by determining the dependencies and starting
+   %% the apps in the required order (called "topological ordering" in the relx
+   %% docs.
   {applications, [
                   kernel,
                   stdlib,
