@@ -2,15 +2,6 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="abc265b6-f9c8-4e05-a0ec-a198bbd297bf" name="Default" comment="">
-      <change type="DELETED" beforePath="$PROJECT_DIR$/deps/goldrush" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/deps/lager" afterPath="" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Makefile" afterPath="$PROJECT_DIR$/Makefile" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/modules.xml" afterPath="$PROJECT_DIR$/.idea/modules.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/priv/pub_proto.config" afterPath="$PROJECT_DIR$/priv/pub_proto.config" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/publish_proto_publish.erl" afterPath="$PROJECT_DIR$/src/publish_proto_publish.erl" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/publish_proto_publisher_worker.erl" afterPath="$PROJECT_DIR$/src/publish_proto_publisher_worker.erl" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/rebar.config" afterPath="$PROJECT_DIR$/rebar.config" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/relx.config" afterPath="$PROJECT_DIR$/relx.config" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
     </list>
     <ignored path="subpub-publish-proto.erlang.iws" />
@@ -83,6 +74,11 @@
     </leaf>
   </component>
   <component name="Git.Settings">
+    <option name="PREVIOUS_COMMIT_AUTHORS">
+      <list>
+        <option value="Rich Youngkin &lt;rich.youngkin@gmail.com&gt;" />
+      </list>
+    </option>
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
   <component name="IdeDocumentHistory">
@@ -438,7 +434,13 @@
       <option name="project" value="LOCAL" />
       <updated>1421957762683</updated>
     </task>
-    <option name="localTasksCounter" value="2" />
+    <task id="LOCAL-00002" summary="Added Makefile support for &quot;rebar get-deps&quot;. Tried adding Inaka's worker_pool to support publishing, but ended up pulling it out.">
+      <created>1422459437961</created>
+      <option name="number" value="00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1422459437961</updated>
+    </task>
+    <option name="localTasksCounter" value="3" />
     <servers />
   </component>
   <component name="ToolWindowManager">
@@ -482,6 +484,8 @@
     <option name="myLimit" value="2678400000" />
   </component>
   <component name="VcsManagerConfiguration">
+    <option name="CHECK_CODE_SMELLS_BEFORE_PROJECT_COMMIT" value="false" />
+    <option name="CHECK_NEW_TODO" value="false" />
     <option name="myTodoPanelSettings">
       <TodoPanelSettings />
     </option>
@@ -492,7 +496,8 @@
       <path value="$PROJECT_DIR$/deps/eper" />
     </ignored-roots>
     <MESSAGE value="Added configuration support (e.g., RabbitMQ server address); added SMP support to vm.args; modified relx.config to include required applications for Erlang Observer." />
-    <option name="LAST_COMMIT_MESSAGE" value="Added configuration support (e.g., RabbitMQ server address); added SMP support to vm.args; modified relx.config to include required applications for Erlang Observer." />
+    <MESSAGE value="Added Makefile support for &quot;rebar get-deps&quot;. Tried adding Inaka's worker_pool to support publishing, but ended up pulling it out." />
+    <option name="LAST_COMMIT_MESSAGE" value="Added Makefile support for &quot;rebar get-deps&quot;. Tried adding Inaka's worker_pool to support publishing, but ended up pulling it out." />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
