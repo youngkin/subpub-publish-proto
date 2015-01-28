@@ -4,3 +4,5 @@ deps/lager
 .rebar
 _rel/*
 ebin/*
+ebin-erlang/*
+*.ORIG
