@@ -64,6 +64,10 @@ init([]) ->
 handle_call(publish_message, _From, #state{publisher_pids = PublisherPids, next_publish_worker = NextPublishWorker} = _State) ->
 %%   wpool:call(publisher_pool, publish_message),
   PublisherPid = lists:nth(NextPublishWorker, PublisherPids),
+  %% TODO
+  %% TODO need a receive loop here to make this call synchronous? 
+  %% TODO otherwise this doesn't mirror prospero
+  %% TODO
   PublisherPid ! publish_message,
   NewNextPublishWorker =
     case NextPublishWorker >= length(PublisherPids) of
@@ -85,7 +89,7 @@ handle_cast(Request, State) ->
 %% handle_info
 %%
 handle_info({'EXIT', _Pid, killed}, State) ->
-  lager:warning("Publisher worked killed"),
+  lager:warning("Publisher worker killed"),
   {noreply, State};
 handle_info({'EXIT', _Pid, Reason}, State) ->
   lager:warning("Publisher worker exited for Reason ~p", [Reason]),
@@ -112,7 +116,7 @@ start_publishers(NumPublishers) ->
 start_publishers(0, PublisherPids) -> PublisherPids;
 start_publishers(NumPublishers, PublisherPids) ->
   Placeholder = 0,
-  Pid = spawn_link(publish_proto_publisher_worker, loup_garou,
+  Pid = spawn_link(publish_proto_publisher_worker, loop,
     [{Placeholder, Placeholder, Placeholder, Placeholder, Placeholder}]),
   process_flag(trap_exit, true),
   Pid ! start,

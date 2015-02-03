@@ -54,7 +54,7 @@ init([]) ->
 %% handle_call
 %%
 handle_call(start, _From, _State) ->
-  Headers = publish_proto_config:get(headers),
+  Headers = publish_proto_config:get(subscriber_headers),
   SubscriberPids = start_subscribers(Headers),
   lager:info("Started Subscribers, Pids = ~p", [SubscriberPids]),
   {reply, ok, #state{subscriber_pids = SubscriberPids}};
@@ -103,7 +103,7 @@ start_subscribers(Headers) ->
 start_subscribers([], SubscriberPids) -> SubscriberPids;
 start_subscribers([Header | RemainingHeaders], SubscriberPids) ->
   Empty = 0,
-  Pid = spawn_link(publisher_proto_subscriber_worker, loup_garou, [Header, Empty, Empty, Empty]),
+  Pid = spawn_link(publisher_proto_subscriber_worker, loop, [Header, Empty, Empty, Empty]),
   process_flag(trap_exit, true),
   Pid ! start,
   start_subscribers(RemainingHeaders, [Pid | SubscriberPids]).

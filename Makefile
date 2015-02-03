@@ -21,4 +21,4 @@ compile:
 	$(REBAR) compile
 
 release:
-	$(RELX) release
+	$(RELX) release tar

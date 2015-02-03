@@ -60,8 +60,18 @@ init([]) ->
 %% handle_call
 %%
 handle_call(stop_test, _From, #state{test_pid = TestPid} = _State) ->
-  exit(TestPid, kill),
-  timer:sleep(1000), % give publisher a chance to stop before stopping subs
+  %%
+  %% try/catch doesn't actually prevent the exit/2 from failing back to the
+  %% caller. Had to change spawn_link/1 to spawn/1 to fix the problem. Why?
+  %% Leaving try/catch in place for now.
+  %%
+  try exit(TestPid, kill) of
+    _OK -> _OK
+  catch
+    exit:Exit -> lager:info("Publishing test driver exited for reason ~p, terminating test", [Exit])
+  end,
+  % give publisher a chance to stop before stopping subs; this makes no difference however, subs are still stopping first
+  timer:sleep(2000), 
   publish_proto_subscriber_pool:stop(),
   lager:info("STOPPED TEST"),
   {reply, ok, #state{test_pid = <<"">>}};
@@ -75,7 +85,7 @@ handle_call(_Request, _From, State) ->
 handle_cast(start_test, _State) ->
   publish_proto_subscriber_pool:start(),
   timer:sleep(100), % give subscribers a chance to register before starting publisher
-  Pid = spawn_link(fun run_test/0),
+  Pid = spawn(fun run_test/0),
   lager:info("Starting test: PID = ~p", [Pid]),
   {noreply, #state{test_pid = Pid}};
 handle_cast(_Request, State) ->
@@ -84,7 +94,14 @@ handle_cast(_Request, State) ->
 %%
 %% handle_info
 %%
-handle_info(_Info, State) ->
+handle_info({'EXIT', _Pid, killed}, State) ->
+  lager:warning("Publishing test driver stopped, test terminating"),
+  {noreply, State};
+handle_info({'EXIT', _Pid, Reason}, State) ->
+  lager:warning("Publishing test driver exited for Reason ~p", [Reason]),
+  {noreply, State};
+handle_info(Info, State) ->
+  lager:warning("Unknown info message: ~p", [Info]),
   {noreply, State}.
 
 terminate(Reason, _State) ->
@@ -99,7 +116,7 @@ code_change(_OldVsn, State, _Extra) ->
 %%%===================================================================
 
 run_test() ->
-%%   TODO: add a configurable sleep interval between message publishing?
+  timer:sleep(publish_proto_config:get(inter_publish_pause)),
   publish_proto_publish_pool:publish_message(),
   run_test().
   

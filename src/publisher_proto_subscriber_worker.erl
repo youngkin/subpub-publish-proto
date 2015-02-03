@@ -26,31 +26,30 @@
 %%% API
 %%%===================================================================
 
-%% loop => loup_garou aka werewolf, geek humor :)
--export([loup_garou/4]).
+-export([loop/4]).
 
-loup_garou(Headers, Connection, Channel, QueueNameBin) ->
+loop(Headers, Connection, Channel, QueueNameBin) ->
   receive
     start ->
       lager:info("start(~p)", [Headers]),
       {NewHeaders, NewConnection, NewChannel, NewQueueNameBin} = subscribe(Headers),
-      loup_garou(NewHeaders, NewConnection, NewChannel, NewQueueNameBin);
+      loop(NewHeaders, NewConnection, NewChannel, NewQueueNameBin);
     stop ->
       unsubscribe(Connection, Channel, QueueNameBin),
       ok;
     #'basic.consume_ok' {} ->
-      loup_garou(Headers, Connection, Channel, QueueNameBin);
+      loop(Headers, Connection, Channel, QueueNameBin);
     #'basic.cancel' {} ->
-      loup_garou(Headers, Connection, Channel, QueueNameBin);
+      loop(Headers, Connection, Channel, QueueNameBin);
     {#'basic.deliver'{delivery_tag=DeliveryTag}, Content} ->
       #amqp_msg{payload = _Payload, props = Props} = Content,
       _MessageId = Props#'P_basic'.correlation_id,
 %%   lager:info("DELIVERED: msg=~p; delivery_tag=~p; PayLoad=~p", [MessageId, DeliveryTag, Payload]),
       amqp_channel:call(Channel,#'basic.ack'{delivery_tag=DeliveryTag}),
-      loup_garou(Headers, Connection, Channel, QueueNameBin);
+      loop(Headers, Connection, Channel, QueueNameBin);
     UnexpectedMsg -> 
       lager:error("Unexpected message: ~p", [UnexpectedMsg]),
-      loup_garou(Headers, Connection, Channel, QueueNameBin)
+      loop(Headers, Connection, Channel, QueueNameBin)
   end.
 
 %%%===================================================================
@@ -82,7 +81,8 @@ unsubscribe(Connection, Channel, QueueNameBin) ->
   end.
 
 get_rabbit_conn_and_channel() ->
-  RabbitHost = publish_proto_config:get(local_broker_address),
+%%   RabbitHost = publish_proto_config:get(local_broker_address),
+  RabbitHost = publish_proto_config:get(broker_address),
   {ok, Connection} = amqp_connection:start(#amqp_params_network{host=RabbitHost}),
   {ok, Channel} = amqp_connection:open_channel(Connection),
   {Connection, Channel}.
@@ -91,7 +91,8 @@ get_rabbit_conn_and_channel() ->
 %%% Defines quality-of-service parameters for the associated Channel.
 %%%
 basic_qos_declare(Channel) ->
-  BasicQos = #'basic.qos'{prefetch_size = 0, prefetch_count = 3, global = false},
+  PrefetchCount = publish_proto_config:get(consumer_prefetch_count),
+  BasicQos = #'basic.qos'{prefetch_size = 0, prefetch_count = PrefetchCount, global = false},
   #'basic.qos_ok'{} = amqp_channel:call(Channel, BasicQos).
 
 %%%
