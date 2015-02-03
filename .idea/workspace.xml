@@ -2,15 +2,6 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="abc265b6-f9c8-4e05-a0ec-a198bbd297bf" name="Default" comment="">
-      <change type="MOVED" beforePath="$PROJECT_DIR$/priv/pub_proto.config" afterPath="$PROJECT_DIR$/priv/publish_proto.config" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Makefile" afterPath="$PROJECT_DIR$/Makefile" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/publish_proto_config.erl" afterPath="$PROJECT_DIR$/src/publish_proto_config.erl" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/publish_proto_publish_pool.erl" afterPath="$PROJECT_DIR$/src/publish_proto_publish_pool.erl" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/publish_proto_publisher_worker.erl" afterPath="$PROJECT_DIR$/src/publish_proto_publisher_worker.erl" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/publish_proto_subscriber_pool.erl" afterPath="$PROJECT_DIR$/src/publish_proto_subscriber_pool.erl" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/publish_proto_test_driver.erl" afterPath="$PROJECT_DIR$/src/publish_proto_test_driver.erl" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/publisher_proto_subscriber_worker.erl" afterPath="$PROJECT_DIR$/src/publisher_proto_subscriber_worker.erl" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/relx.config" afterPath="$PROJECT_DIR$/relx.config" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
     </list>
     <ignored path="subpub-publish-proto.erlang.iws" />
@@ -499,7 +490,13 @@
       <option name="project" value="LOCAL" />
       <updated>1422485983509</updated>
     </task>
-    <option name="localTasksCounter" value="4" />
+    <task id="LOCAL-00004" summary="Minor refactoring; Renamed config file; Get more runtime variables from config file (vs. hardcoded); Added creation of tarball as part of the release creation process (relx).">
+      <created>1422998218260</created>
+      <option name="number" value="00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1422998218260</updated>
+    </task>
+    <option name="localTasksCounter" value="5" />
     <servers />
   </component>
   <component name="TodoView" selected-index="0">
@@ -577,7 +574,8 @@
     <MESSAGE value="Added configuration support (e.g., RabbitMQ server address); added SMP support to vm.args; modified relx.config to include required applications for Erlang Observer." />
     <MESSAGE value="Added Makefile support for &quot;rebar get-deps&quot;. Tried adding Inaka's worker_pool to support publishing, but ended up pulling it out." />
     <MESSAGE value="Added support from a single publishing process to a pool of publishing processes, each with their own RabbitMQ connection and channel." />
-    <option name="LAST_COMMIT_MESSAGE" value="Added support from a single publishing process to a pool of publishing processes, each with their own RabbitMQ connection and channel." />
+    <MESSAGE value="Minor refactoring; Renamed config file; Get more runtime variables from config file (vs. hardcoded); Added creation of tarball as part of the release creation process (relx)." />
+    <option name="LAST_COMMIT_MESSAGE" value="Minor refactoring; Renamed config file; Get more runtime variables from config file (vs. hardcoded); Added creation of tarball as part of the release creation process (relx)." />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
