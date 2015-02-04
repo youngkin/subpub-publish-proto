@@ -36,6 +36,7 @@ loop(Headers, Connection, Channel, QueueNameBin) ->
       loop(NewHeaders, NewConnection, NewChannel, NewQueueNameBin);
     stop ->
       unsubscribe(Connection, Channel, QueueNameBin),
+      %% TODO STOP/EXIT here????
       ok;
     #'basic.consume_ok' {} ->
       loop(Headers, Connection, Channel, QueueNameBin);
@@ -47,6 +48,9 @@ loop(Headers, Connection, Channel, QueueNameBin) ->
 %%   lager:info("DELIVERED: msg=~p; delivery_tag=~p; PayLoad=~p", [MessageId, DeliveryTag, Payload]),
       amqp_channel:call(Channel,#'basic.ack'{delivery_tag=DeliveryTag}),
       loop(Headers, Connection, Channel, QueueNameBin);
+    {'EXIT', Channel, Reason} ->
+      lager:error("Channel exited, this subscriber is terminating for ~p", [Reason]),
+      self() ! stop;
     UnexpectedMsg -> 
       lager:error("Unexpected message: ~p", [UnexpectedMsg]),
       loop(Headers, Connection, Channel, QueueNameBin)
@@ -85,6 +89,8 @@ get_rabbit_conn_and_channel() ->
   RabbitHost = publish_proto_config:get(broker_address),
   {ok, Connection} = amqp_connection:start(#amqp_params_network{host=RabbitHost}),
   {ok, Channel} = amqp_connection:open_channel(Connection),
+  process_flag(trap_exit, true),
+  link(Channel),
   {Connection, Channel}.
 
 %%%
