@@ -31,7 +31,11 @@ loop( State = {Connection, Channel, _ExchangeNameBin, _IntervalStart, _PubTimesL
       amqp_channel:close(Channel),
       amqp_connection:close(Connection),
       lager:info("TERMINATING"),
+      %% TODO stop/exit here?
       ok;
+    {'EXIT', What, Reason} ->
+      lager:error("Connection or Channel exited (~p), this publisher is terminating for ~p", [What, Reason]),
+      self() ! stop;
     %%
     %% RabbitMQ callbacks.
     %% The next 2 RabbitMQ callbacks aren't supported by amqp_client-2.7.1,
@@ -105,6 +109,9 @@ initialize_rabbit() ->
   RabbitHost = publish_proto_config:get(broker_address),
   {ok, Connection} = amqp_connection:start(#amqp_params_network{host=RabbitHost}),
   {ok, Channel} = amqp_connection:open_channel(Connection),
+  process_flag(trap_exit, true),
+  link(Connection),
+  link(Channel),
   BasicQos = #'basic.qos'{prefetch_size = 0, prefetch_count = 3, global = false},
   #'basic.qos_ok'{} = amqp_channel:call(Channel, BasicQos),
 
