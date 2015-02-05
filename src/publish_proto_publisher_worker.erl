@@ -28,10 +28,11 @@ loop( State = {Connection, Channel, _ExchangeNameBin, _IntervalStart, _PubTimesL
       NewState = publish_message(State),
       loop(NewState);
     stop ->
+      unlink(Channel),
+      unlink(Connection),
       amqp_channel:close(Channel),
       amqp_connection:close(Connection),
       lager:info("TERMINATING"),
-      %% TODO stop/exit here?
       ok;
     {'EXIT', What, Reason} ->
       lager:error("Connection or Channel exited (~p), this publisher is terminating for ~p", [What, Reason]),

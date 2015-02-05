@@ -36,7 +36,6 @@ loop(Headers, Connection, Channel, QueueNameBin) ->
       loop(NewHeaders, NewConnection, NewChannel, NewQueueNameBin);
     stop ->
       unsubscribe(Connection, Channel, QueueNameBin),
-      %% TODO STOP/EXIT here????
       ok;
     #'basic.consume_ok' {} ->
       loop(Headers, Connection, Channel, QueueNameBin);
@@ -54,6 +53,24 @@ loop(Headers, Connection, Channel, QueueNameBin) ->
     UnexpectedMsg -> 
       lager:error("Unexpected message: ~p", [UnexpectedMsg]),
       loop(Headers, Connection, Channel, QueueNameBin)
+  after 60000 ->
+    lager:warning("No message received for Queue ~p for 15 seconds", [binary_to_list(QueueNameBin)]),
+    lager:warning("Process mailbox size is ~p", [process_info(self(), message_queue_len)]),
+    ConnectionStatus = try amqp_connection:info_keys(Connection) of
+      ConnectionInfo -> ConnectionInfo
+    catch
+      Error -> Error
+    end,
+    NextPublishSeqNo = 
+      try amqp_channel:next_publish_seqno(Channel) of
+        SeqNo -> SeqNo
+      catch
+        SeqNoError -> SeqNoError
+      end,
+    lager:warning("Connection status: ~p; indicates if connection is active", [ConnectionStatus]),
+    lager:warning("Channel status: ~p; indicates if channel is active", [NextPublishSeqNo]),
+    lager:warning("STOPPING TEST DUE TO INACTIVITY"),
+    publish_proto_test_driver:stop_test()
   end.
 
 %%%===================================================================
