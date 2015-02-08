@@ -23,8 +23,9 @@
   code_change/3]).
 
 -define(SERVER, ?MODULE).
+-define(PUBLISH_STATS_DELAY, 30000). %% 30 seconds
 
--record(state, {subscriber_pids = [], headers = []}).
+-record(state, {subscriber_pids = [], headers = [], transit_duration_list = []}).
 
 %%%===================================================================
 %%% API
@@ -48,6 +49,7 @@ start_link() ->
 %%%===================================================================
 
 init([]) ->
+  erlang:send_after(?PUBLISH_STATS_DELAY, self(), publish_stats),
   {ok, #state{subscriber_pids = []}}.
 
 %%
@@ -76,6 +78,37 @@ handle_cast(Request, State) ->
 %%
 %% handle_info
 %%
+handle_info(publish_stats, State) ->
+  SubscriberPids = State#state.subscriber_pids,
+  Headers = State#state.headers,
+  TransitTimeDurationList = State#state.transit_duration_list,
+  case length(TransitTimeDurationList) of
+    0 ->
+      AvgTransitTime = 0,
+      MedianTransitTime = 0,
+      MinTransitTime = 0,
+      MaxTransitTime = 0;
+    _ ->
+      AvgTransitTime = calc_time_avg(TransitTimeDurationList),
+      MedianTransitTime = calc_time_median(TransitTimeDurationList),
+      MinTransitTime = lists:min(TransitTimeDurationList),
+      MaxTransitTime = lists:max(TransitTimeDurationList)
+  end,
+  lager:info("Message transit time stats (in millis): Min = ~p, Max = ~p, Median = ~p, Avg = ~p",
+    [MinTransitTime, MaxTransitTime, MedianTransitTime, AvgTransitTime]),
+  NewState = #state{subscriber_pids = SubscriberPids, headers = Headers,
+    transit_duration_list = []},
+  erlang:send_after(?PUBLISH_STATS_DELAY, self(), publish_stats),
+  {noreply, NewState };
+
+handle_info({record_stats, TransitDurationMillis}, State) ->
+  SubscriberPids = State#state.subscriber_pids,
+  Headers = State#state.headers,
+  TransitTimeDurationList = State#state.transit_duration_list,
+  NewTransitDurationList = [TransitDurationMillis | TransitTimeDurationList],
+  {noreply, #state{subscriber_pids = SubscriberPids, headers = Headers,
+    transit_duration_list = NewTransitDurationList} };
+
 handle_info({'EXIT', _Pid, killed}, State) ->
   lager:warning("Subscriber worked killed"),
   {noreply, State};
@@ -103,7 +136,7 @@ start_subscribers(Headers) ->
 start_subscribers([], SubscriberPids) -> SubscriberPids;
 start_subscribers([Header | RemainingHeaders], SubscriberPids) ->
   Empty = 0,
-  Pid = spawn_link(publisher_proto_subscriber_worker, loop, [Header, Empty, Empty, Empty]),
+  Pid = spawn_link(publisher_proto_subscriber_worker, loop, [self(), Header, Empty, Empty, Empty]),
   process_flag(trap_exit, true),
   Pid ! start,
   start_subscribers(RemainingHeaders, [Pid | SubscriberPids]).
@@ -113,3 +146,27 @@ stop_subscribers([Pid | RemainingPids]) ->
   Pid ! stop,
   stop_subscribers(RemainingPids).
 
+calc_time_avg(PubDurationsList) ->
+  Sum = lists:sum(PubDurationsList),
+  case length(PubDurationsList) of
+    0 -> 0;
+    N -> Sum / N
+  end.
+
+calc_time_median(PubDurationsList) ->
+  SortedList = lists:sort(PubDurationsList),
+  Len = length(SortedList),
+  case Len of
+    0 -> 0;
+    N -> case (N rem 2) of
+           0 ->
+             MedianPosition = round(N / 2),
+             {List1, List2} = lists:split(MedianPosition, SortedList),
+             Num1 = lists:last(List1),
+             [Num2 | _] = List2,
+             (Num1 + Num2) / 2;
+           _ ->
+             MedianPosition = round(N / 2),
+             lists:nth(MedianPosition, SortedList)
+         end
+  end.

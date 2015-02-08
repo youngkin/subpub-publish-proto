@@ -31,8 +31,9 @@
 -export([start_link/0]).
 
 -define(SERVER, ?MODULE).
+-define(PUBLISH_STATS_DELAY, 30000). %% 30 seconds
 
--record(state, {publisher_pids = [], next_publish_worker = 1}).
+-record(state, {publisher_pids = [], next_publish_worker = 1, pub_duration_list = []}).
 
 %% ====================================================================
 %% API functions
@@ -53,16 +54,15 @@ start_link() ->
 
 init([]) ->
   lager:info("Started publish_proto_publish gen_server"),
-%%   wpool:start_pool(publisher_pool,
-%%     [{workers, 10}, {worker, {publish_proto_publisher_worker, []}}]),
+  erlang:send_after(?PUBLISH_STATS_DELAY, self(), publish_stats),
   PublisherPids = start_publishers(publish_proto_config:get(publishing_pool_size)),
   {ok, #state{publisher_pids = PublisherPids}}.
 
 %%
 %% Publishes to a pool of publisher workers chosen in a round-robin fashion
 %%
-handle_call(publish_message, _From, #state{publisher_pids = PublisherPids, next_publish_worker = NextPublishWorker} = _State) ->
-%%   wpool:call(publisher_pool, publish_message),
+handle_call(publish_message, _From, #state{publisher_pids = PublisherPids, next_publish_worker = NextPublishWorker,
+  pub_duration_list = PublishDurationList} = _State) ->
   PublisherPid = lists:nth(NextPublishWorker, PublisherPids),
   %% TODO
   %% TODO need a receive loop here to make this call synchronous? 
@@ -76,7 +76,8 @@ handle_call(publish_message, _From, #state{publisher_pids = PublisherPids, next_
       false ->
         NextPublishWorker + 1
     end,
-  {reply, ok, #state{publisher_pids = PublisherPids, next_publish_worker = NewNextPublishWorker}};
+  {reply, ok, #state{publisher_pids = PublisherPids, next_publish_worker = NewNextPublishWorker,
+    pub_duration_list = PublishDurationList}};
 handle_call(Request, _From, State) ->
   lager:warning("Unknown call: ~p", [Request]),
   {reply, ok, State}.
@@ -88,6 +89,37 @@ handle_cast(Request, State) ->
 %%
 %% handle_info
 %%
+handle_info(publish_stats, State) ->
+  PublisherPids = State#state.publisher_pids,
+  NextPublishWorker = State#state.next_publish_worker,
+  PublishDurationList = State#state.pub_duration_list,
+  case length(PublishDurationList) of
+    0 ->
+      AvgPubTime = 0,
+      MedianPubTime = 0,
+      MinPubTime = 0,
+      MaxPubTime = 0;
+    _ ->
+      AvgPubTime = calc_publish_time_avg(PublishDurationList),
+      MedianPubTime = calc_publish_time_median(PublishDurationList),
+      MinPubTime = lists:min(PublishDurationList),
+      MaxPubTime = lists:max(PublishDurationList)
+  end,
+  lager:info("Publish interval stats (in millis): Min = ~p, Max = ~p, Median = ~p, Avg = ~p",
+    [MinPubTime, MaxPubTime, MedianPubTime, AvgPubTime]),
+  NewState = #state{publisher_pids = PublisherPids, next_publish_worker = NextPublishWorker,
+    pub_duration_list = []},
+  erlang:send_after(?PUBLISH_STATS_DELAY, self(), publish_stats),
+  {noreply, NewState };
+
+handle_info({record_stats, PubDurationMillis}, State) ->
+  PublisherPids = State#state.publisher_pids,
+  NextPublishWorker = State#state.next_publish_worker,
+  PublishDurationList = State#state.pub_duration_list,
+  NewPubDurationList = [PubDurationMillis | PublishDurationList],
+  {noreply, #state{publisher_pids = PublisherPids, next_publish_worker = NextPublishWorker,
+    pub_duration_list = NewPubDurationList} };
+
 handle_info({'EXIT', _Pid, killed}, State) ->
   lager:warning("Publisher worker killed"),
   {noreply, State};
@@ -98,6 +130,9 @@ handle_info(Info, State) ->
   lager:warning("Unknown info message: ~p", [Info]),
   {noreply, State}.
 
+%%
+%% terminate & code_change
+%%
 terminate(_Reason, #state{publisher_pids = PublisherPids} = _State) ->
   lager:info("TERMINATING for Reason ~p; Stopping all publisher workers", [_Reason]),
   stop_publishers(PublisherPids),
@@ -117,7 +152,7 @@ start_publishers(0, PublisherPids) -> PublisherPids;
 start_publishers(NumPublishers, PublisherPids) ->
   Placeholder = 0,
   Pid = spawn_link(publish_proto_publisher_worker, loop,
-    [{Placeholder, Placeholder, Placeholder, Placeholder, Placeholder}]),
+    [{self(), Placeholder, Placeholder, Placeholder}]),
   process_flag(trap_exit, true),
   Pid ! start,
   start_publishers(NumPublishers - 1, [Pid | PublisherPids]).
@@ -126,3 +161,29 @@ stop_publishers([]) -> ok;
 stop_publishers([Pid | RemainingPids]) ->
   Pid ! stop,
   stop_publishers(RemainingPids).
+
+calc_publish_time_avg(PubDurationsList) ->
+  Sum = lists:sum(PubDurationsList),
+  case length(PubDurationsList) of
+    0 -> 0;
+    N -> Sum / N
+  end.
+
+calc_publish_time_median(PubDurationsList) ->
+  SortedList = lists:sort(PubDurationsList),
+  Len = length(SortedList),
+  case Len of
+    0 -> 0;
+    N -> case (N rem 2) of
+           0 ->
+             MedianPosition = round(N / 2),
+             {List1, List2} = lists:split(MedianPosition, SortedList),
+             Num1 = lists:last(List1),
+             [Num2 | _] = List2,
+             (Num1 + Num2) / 2;
+           _ ->
+             MedianPosition = round(N / 2),
+             lists:nth(MedianPosition, SortedList)
+         end
+  end.
+

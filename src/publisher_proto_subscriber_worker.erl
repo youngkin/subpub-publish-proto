@@ -26,33 +26,36 @@
 %%% API
 %%%===================================================================
 
--export([loop/4]).
+-export([loop/5]).
 
-loop(Headers, Connection, Channel, QueueNameBin) ->
+loop(ParentPid, Headers, Connection, Channel, QueueNameBin) ->
   receive
     start ->
       lager:info("start(~p)", [Headers]),
       {NewHeaders, NewConnection, NewChannel, NewQueueNameBin} = subscribe(Headers),
-      loop(NewHeaders, NewConnection, NewChannel, NewQueueNameBin);
+      loop(ParentPid, NewHeaders, NewConnection, NewChannel, NewQueueNameBin);
     stop ->
       unsubscribe(Connection, Channel, QueueNameBin),
       ok;
     #'basic.consume_ok' {} ->
-      loop(Headers, Connection, Channel, QueueNameBin);
+      loop(ParentPid, Headers, Connection, Channel, QueueNameBin);
     #'basic.cancel' {} ->
-      loop(Headers, Connection, Channel, QueueNameBin);
+      loop(ParentPid, Headers, Connection, Channel, QueueNameBin);
     {#'basic.deliver'{delivery_tag=DeliveryTag}, Content} ->
-      #amqp_msg{payload = _Payload, props = Props} = Content,
+      #amqp_msg{payload = TimeSentBin, props = Props} = Content,
       _MessageId = Props#'P_basic'.correlation_id,
-%%   lager:info("DELIVERED: msg=~p; delivery_tag=~p; PayLoad=~p", [MessageId, DeliveryTag, Payload]),
+      TimeSent = binary_to_term(TimeSentBin),
+      TransitTimeMillis = timer:now_diff(now(), TimeSent) / 1000,  %% convert from microsecs to millisecs
+%%       lager:info("DELIVERED: msg=~p; delivery_tag=~p; TransitTime(millis)=~p", [_MessageId, DeliveryTag, TransitTimeMillis]),
       amqp_channel:call(Channel,#'basic.ack'{delivery_tag=DeliveryTag}),
-      loop(Headers, Connection, Channel, QueueNameBin);
+      ParentPid ! {record_stats, TransitTimeMillis},
+      loop(ParentPid, Headers, Connection, Channel, QueueNameBin);
     {'EXIT', What, Reason} ->
       lager:error("Connection or Channel exited (~p), this subscriber is terminating for ~p", [What, Reason]),
       self() ! stop;
     UnexpectedMsg -> 
       lager:error("Unexpected message: ~p", [UnexpectedMsg]),
-      loop(Headers, Connection, Channel, QueueNameBin)
+      loop(ParentPid, Headers, Connection, Channel, QueueNameBin)
   after 60000 ->
     lager:warning("No message received for Queue ~p for 15 seconds", [binary_to_list(QueueNameBin)]),
     lager:warning("Process mailbox size is ~p", [process_info(self(), message_queue_len)]),
