@@ -116,7 +116,7 @@ code_change(_OldVsn, State, _Extra) ->
 %%%===================================================================
 
 run_test() ->
-  timer:sleep(publish_proto_config:get(inter_publish_pause)),
+  timer:sleep(publish_proto_config:get(inter_publish_pause_millis)),
   publish_proto_publish_pool:publish_message(),
   run_test().
   

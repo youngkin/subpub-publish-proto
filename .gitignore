@@ -1,6 +1,14 @@
 *.beam
 deps/goldrush
 deps/lager
+deps/afunix/
+deps/bear/
+deps/exo/
+deps/exometer/
+deps/folsom/
+deps/meck/
+deps/netlink/
+deps/recon/
 .rebar
 _rel/*
 ebin/*

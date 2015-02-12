@@ -29,6 +29,7 @@
 -export([loop/5]).
 
 loop(ParentPid, Headers, Connection, Channel, QueueNameBin) ->
+  SubscriberTimeout = publish_proto_config:get(subscriber_timeout_millis),
   receive
     start ->
       lager:info("start(~p)", [Headers]),
@@ -56,8 +57,8 @@ loop(ParentPid, Headers, Connection, Channel, QueueNameBin) ->
     UnexpectedMsg -> 
       lager:error("Unexpected message: ~p", [UnexpectedMsg]),
       loop(ParentPid, Headers, Connection, Channel, QueueNameBin)
-  after 60000 ->
-    lager:warning("No message received for Queue ~p for 15 seconds", [binary_to_list(QueueNameBin)]),
+  after SubscriberTimeout ->
+    lager:warning("No message received for Queue ~p for ~p seconds", [binary_to_list(QueueNameBin), SubscriberTimeout / 1000]),
     lager:warning("Process mailbox size is ~p", [process_info(self(), message_queue_len)]),
     ConnectionStatus = try amqp_connection:info_keys(Connection) of
       ConnectionInfo -> ConnectionInfo

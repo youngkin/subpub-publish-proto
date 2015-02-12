@@ -44,9 +44,11 @@
 -export([start/2,stop/1, start_phase/3]).
 
 -define(APP, publish_proto).
+-define(INTERVAL, 5000).
 
 start(_Type, _StartArgs) ->
     lager:info("Starting publish_proto_app"),
+    configure_stats(),
     publish_proto_sup:start_link().
   
 
@@ -56,4 +58,35 @@ stop(_State) ->
 
 start_phase(init, _StartType, _StartArgs) ->
     ok.
+
+%%%===================================================================
+%%% Internal functions
+%%%===================================================================
+
+configure_stats() ->
+%%   StatsCollectionIntervalMillis = publish_proto_config:get(stats_collection_interval_millis),
+  
+  % VM memory.
+  % total = processes + system.
+  % processes = used by Erlang processes, their stacks and heaps.
+  % system = used but not directly related to any Erlang process.
+  % atom = allocated for atoms (included in system).
+  % binary = allocated for binaries (included in system).
+  % ets = allocated for ETS tables (included in system).
+  ok = exometer:new([publish_proto, erlang, memory],
+    {function, erlang, memory, ['$dp'], value,
+      [total, processes, system, atom, binary, ets]}),
+%%   ok = exometer_report:subscribe(exometer_report_statsd,
+%%     [erlang, memory],
+%%     [total, processes, system, atom, binary,
+%%       ets], StatsCollectionIntervalMillis),
+  
+  % Memory actively used by the VM, allocated (should ~match OS allocation),
+  % unused (i.e. allocated - used), and usage (used / allocated).
+  ok = exometer:new([publish_proto, recon, alloc],
+    {function, recon_alloc, memory, ['$dp'], value,
+      [used, allocated, unused, usage]}).
+%%   ok = exometer_report:subscribe(exometer_report_statsd,
+%%     [recon, alloc],
+%%     [used, allocated, unused, usage], StatsCollectionIntervalMillis).
 
