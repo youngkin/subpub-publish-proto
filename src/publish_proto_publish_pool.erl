@@ -102,11 +102,6 @@ handle_info(log_stats, State) ->
   NextPublishWorker = State#state.next_publish_worker,
   PublishDurationList = State#state.pub_duration_list,
   LastSampleTime = State#state.last_sample_time,
-  lager:info("LastSampleTime = ~p", [LastSampleTime]),
-  
-  %% TODO DEBUG only, remove
-%%   exometer:update([erlang,random,integer], 500),
-%%   exometer:update([publish_proto, publish, latency], 13),
 
   case length(PublishDurationList) of
     0 ->
@@ -120,28 +115,28 @@ handle_info(log_stats, State) ->
       MinPubTime = lists:min(PublishDurationList),
       MaxPubTime = lists:max(PublishDurationList)
   end,
-  lager:info("Publish interval stats (in millis): Min = ~p, Max = ~p, Median = ~p, Avg = ~p",
+  lager:info("Publish interval stats (in microseconds): Min = ~p, Max = ~p, Median = ~p, Avg = ~p",
     [MinPubTime, MaxPubTime, MedianPubTime, AvgPubTime]),
   NewState = #state{publisher_pids = PublisherPids, next_publish_worker = NextPublishWorker,
     pub_duration_list = [], last_sample_time = LastSampleTime},
   erlang:send_after(?PUBLISH_STATS_DELAY, self(), log_stats),
   {noreply, NewState };
 
-handle_info({record_stats, PubDurationMillis}, State) ->
+handle_info({record_stats, PubDurationMicros}, State) ->
   %% TODO had to remove the #state{...} = State pattern matching in the argument list because it
   %% TODO wasn't working. Come back and figure out why.
   PublisherPids = State#state.publisher_pids,
   NextPublishWorker = State#state.next_publish_worker,
   PublishDurationList = State#state.pub_duration_list,
   LastSampleTime = State#state.last_sample_time,
-  NewPubDurationList = [PubDurationMillis | PublishDurationList],
+  NewPubDurationList = [PubDurationMicros | PublishDurationList],
   
   %%%
   %%% Publishes stats to exometer. Long term this will replace the rest of this
   %%% function and handle_info/log_stats, and most of the state currently managed
   %%% in support of capturing stats (e.g., pub_duration_list)
   %%%
-  NewLastSampleTime = publish_stats(PubDurationMillis, LastSampleTime),
+  NewLastSampleTime = publish_stats(PubDurationMicros, LastSampleTime),
   {noreply, #state{publisher_pids = PublisherPids, next_publish_worker = NextPublishWorker,
     pub_duration_list = NewPubDurationList, last_sample_time = NewLastSampleTime} };
 
@@ -215,14 +210,11 @@ calc_publish_time_median(PubDurationsList) ->
 get_now_in_gregorian_seconds() ->
   calendar:datetime_to_gregorian_seconds(calendar:now_to_datetime(now())).
 
-publish_stats(PubDurationMillis, LastSampleTime) ->
+publish_stats(PubDurationMicros, LastSampleTime) ->
   SecsSinceLastPublished = get_now_in_gregorian_seconds() - LastSampleTime,
   case SecsSinceLastPublished of
     N when N >= 1 -> %% publish stats 1/sec
-      %% TODO: debug remove
-      lager:info("Publish latency: ~p (millis)", [PubDurationMillis]),
-
-      exometer:update([publish_proto,publish,latency], PubDurationMillis),
+      exometer:update([publish_proto,publish,latency], PubDurationMicros),
       %% TODO DEBUG only, remove
       exometer:update([erlang,random,integer], random:uniform(100)),
 
@@ -243,9 +235,9 @@ configure_stats() ->
       [used, allocated, unused, usage]}),
 
   % TODO Debug metric, does it work?
-  exometer:new([erlang,random,integer], histogram, [{time_span, 600000}]),
+  exometer:new([erlang,random,integer], histogram, [{time_span, 30000}]),
 
   % time_span is one of the histogram options. It's only shown to highlight that there are
   % options. See the exometer_core project in github, exometer_histogram.erl, for details.
-  ok = exometer:new([publish_proto,publish,latency], histogram, [{time_span, 600000}, {slot_period, 10000}]).
+  ok = exometer:new([publish_proto,publish,latency], histogram, [{time_span, 30000}, {slot_period, 1000}]).
 

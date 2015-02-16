@@ -58,8 +58,10 @@ publish_message( {ParentPid, Connection, Channel, ExchangeNameBin} ) ->
   Before = now(),
   publish(Channel, ExchangeNameBin),
   After = now(),
-  PubDurationMillis = timer:now_diff(After, Before) / 1000, % convert from microsecs to millisecs
-  ParentPid ! {record_stats, PubDurationMillis},
+  %% TODO: Add back millis, or keep micros?
+%%   PubDurationMillis = timer:now_diff(After, Before) / 1000, % convert from microsecs to millisecs
+  PubDurationMicros = timer:now_diff(After, Before),
+  ParentPid ! {record_stats, PubDurationMicros},
   {ParentPid, Connection, Channel, ExchangeNameBin}.
 
 publish(Channel, ExchangeName) ->

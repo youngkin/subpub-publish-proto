@@ -4,6 +4,9 @@ deps/lager
 deps/afunix/
 deps/bear/
 deps/exo/
+deps/edown/
+deps/parse_trans/
+deps/setup/
 deps/exometer/
 deps/folsom/
 deps/meck/
