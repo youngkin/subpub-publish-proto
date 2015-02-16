@@ -2,6 +2,7 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="abc265b6-f9c8-4e05-a0ec-a198bbd297bf" name="Default" comment="">
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.gitignore" afterPath="$PROJECT_DIR$/.gitignore" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/priv/publish_proto.config" afterPath="$PROJECT_DIR$/priv/publish_proto.config" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/publish_proto_publish_pool.erl" afterPath="$PROJECT_DIR$/src/publish_proto_publish_pool.erl" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/publish_proto_publisher_worker.erl" afterPath="$PROJECT_DIR$/src/publish_proto_publisher_worker.erl" />
@@ -37,8 +38,8 @@
       <file leaf-file-name="publish_proto_publish_pool.erl" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/publish_proto_publish_pool.erl">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.33942" vertical-offset="2804" max-vertical-offset="3735">
-              <caret line="208" column="0" selection-start-line="208" selection-start-column="0" selection-end-line="208" selection-end-column="0" />
+            <state vertical-scroll-proportion="0.5939968" vertical-offset="2804" max-vertical-offset="3735">
+              <caret line="212" column="35" selection-start-line="212" selection-start-column="35" selection-end-line="212" selection-end-column="35" />
               <folding />
             </state>
           </provider>
@@ -270,7 +271,7 @@
     <property name="project.structure.last.edited" value="Modules" />
     <property name="project.structure.proportion" value="0.15" />
     <property name="project.structure.side.proportion" value="0.2" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$/../../../dev/rabbitmq-java-client-3.4.3/src/com/rabbitmq/tools/Tracer.java" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/../../gitsandbox/stress_exometer" />
     <property name="recentsLimit" value="5" />
     <property name="restartRequiresConfirmation" value="true" />
     <property name="LayoutCode.rearrangeEntriesErlang" value="false" />
@@ -530,7 +531,7 @@
     <layout>
       <window_info id="Palette&#9;" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Designer" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
-      <window_info id="Changes" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.31162196" sideWeight="0.5" order="12" side_tool="false" content_ui="tabs" />
+      <window_info id="Changes" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.31074035" sideWeight="0.5" order="12" side_tool="false" content_ui="tabs" />
       <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.26436782" sideWeight="0.5" order="8" side_tool="false" content_ui="tabs" />
       <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.37420177" sideWeight="0.49962658" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
@@ -979,8 +980,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/publish_proto_publish_pool.erl">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.33942" vertical-offset="2804" max-vertical-offset="3735">
-          <caret line="208" column="0" selection-start-line="208" selection-start-column="0" selection-end-line="208" selection-end-column="0" />
+        <state vertical-scroll-proportion="0.5939968" vertical-offset="2804" max-vertical-offset="3735">
+          <caret line="212" column="35" selection-start-line="212" selection-start-column="35" selection-end-line="212" selection-end-column="35" />
           <folding />
         </state>
       </provider>
