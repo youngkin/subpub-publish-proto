@@ -79,9 +79,14 @@ initialize_rabbit() ->
   RabbitHost = publish_proto_config:get(broker_address),
   {ok, Connection} = amqp_connection:start(#amqp_params_network{host=RabbitHost}),
   {ok, Channel} = amqp_connection:open_channel(Connection),
-  process_flag(trap_exit, true),
-  link(Connection),
-  link(Channel),
+  case publish_proto_config:get(monitor_conn_chnl) of
+    true ->
+      process_flag(trap_exit, true),
+      link(Connection),
+      link(Channel);
+    false ->
+      false
+  end,
   BasicQos = #'basic.qos'{prefetch_size = 0, prefetch_count = 3, global = false},
   #'basic.qos_ok'{} = amqp_channel:call(Channel, BasicQos),
 

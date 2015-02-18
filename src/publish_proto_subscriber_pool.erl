@@ -136,7 +136,7 @@ start_subscribers(Headers) ->
 start_subscribers([], SubscriberPids) -> SubscriberPids;
 start_subscribers([Header | RemainingHeaders], SubscriberPids) ->
   Empty = 0,
-  Pid = spawn_link(publisher_proto_subscriber_worker, loop, [self(), Header, Empty, Empty, Empty]),
+  Pid = spawn_link(publish_proto_subscriber_worker, loop, [self(), Header, Empty, Empty, Empty]),
   process_flag(trap_exit, true),
   Pid ! start,
   start_subscribers(RemainingHeaders, [Pid | SubscriberPids]).

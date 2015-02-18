@@ -12,7 +12,7 @@
 %%% @end
 %%% Created : 23. Jan 2015 2:26 PM
 %%%-------------------------------------------------------------------
--module(publish_proto_publish_pool).
+-module(publish_proto_publisher_pool).
 
 -behaviour(gen_server).
 

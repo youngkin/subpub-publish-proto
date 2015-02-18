@@ -40,7 +40,7 @@ init([]) ->
   MaxRestartSeconds = 10,
   SupervisorStrategy = {RestartStrategy, MaxRestarts, MaxRestartSeconds},
 
-  PublisherSupervisor = ?CHILD(publish_proto_publish_sup, supervisor),
+  PublisherSupervisor = ?CHILD(publish_proto_publisher_sup, supervisor),
   SubscriberSupervisor = ?CHILD(publish_proto_subscriber_sup, supervisor),
   TestDriver = ?CHILD(publish_proto_test_driver, worker),
   {ok, {SupervisorStrategy, [PublisherSupervisor, SubscriberSupervisor, TestDriver]}}.

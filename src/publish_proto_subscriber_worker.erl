@@ -17,7 +17,7 @@
 %%% @end
 %%% Created : 23. Jan 2015 2:26 PM
 %%%-------------------------------------------------------------------
--module(publisher_proto_subscriber_worker).
+-module(publish_proto_subscriber_worker).
 -author("uyounri").
 
 -include("amqp_client.hrl").
@@ -29,34 +29,56 @@
 -export([loop/5]).
 
 loop(ParentPid, Headers, Connection, Channel, QueueNameBin) ->
-  SubscriberTimeout = publish_proto_config:get(subscriber_timeout_millis),
+  %% TODO Push this into loop "State"
+  SubscriberTimeout = case publish_proto_config:get(subscriber_timeout_millis) of
+                      0 -> infinity;
+                      X when X > 0 -> X
+                    end,
   receive
     start ->
       lager:info("start(~p)", [Headers]),
       {NewHeaders, NewConnection, NewChannel, NewQueueNameBin} = subscribe(Headers),
       loop(ParentPid, NewHeaders, NewConnection, NewChannel, NewQueueNameBin);
+    
     stop ->
       unsubscribe(Connection, Channel, QueueNameBin),
+      %% Stop loop
       ok;
+    
     #'basic.consume_ok' {} ->
       loop(ParentPid, Headers, Connection, Channel, QueueNameBin);
+    
     #'basic.cancel' {} ->
       loop(ParentPid, Headers, Connection, Channel, QueueNameBin);
+    
     {#'basic.deliver'{delivery_tag=DeliveryTag}, Content} ->
       #amqp_msg{payload = TimeSentBin, props = Props} = Content,
       _MessageId = Props#'P_basic'.correlation_id,
-      TimeSent = binary_to_term(TimeSentBin),
-      TransitTimeMillis = timer:now_diff(now(), TimeSent) / 1000,  %% convert from microsecs to millisecs
-%%       lager:info("DELIVERED: msg=~p; delivery_tag=~p; TransitTime(millis)=~p", [_MessageId, DeliveryTag, TransitTimeMillis]),
-      amqp_channel:call(Channel,#'basic.ack'{delivery_tag=DeliveryTag}),
-      ParentPid ! {record_stats, TransitTimeMillis},
+      record_pub_delivery_latency(TimeSentBin, ParentPid),
+      case publish_proto_config:get(delayed_ack) of
+        0 ->
+          amqp_channel:call(Channel,#'basic.ack'{delivery_tag=DeliveryTag}),
+          loop(ParentPid, Headers, Connection, Channel, QueueNameBin);
+        N when is_integer(N), N > 0 ->
+          timer:sleep(5000), %% give the 'EXIT' time to be queued before ack_delivery
+          self() ! {ack_delivery, Channel, DeliveryTag},
+          loop(ParentPid, Headers, Connection, Channel, QueueNameBin)
+      end;
+
+    {ack_delivery, ChannelPid, ProvidedDeliveryTag} ->
+      timer:sleep(publish_proto_config:get(delayed_ack)),
+      amqp_channel:call(ChannelPid,#'basic.ack'{delivery_tag=ProvidedDeliveryTag}),
       loop(ParentPid, Headers, Connection, Channel, QueueNameBin);
+    
     {'EXIT', What, Reason} ->
       lager:error("Connection or Channel exited (~p), this subscriber is terminating for ~p", [What, Reason]),
-      self() ! stop;
+      self() ! stop,
+      loop(ParentPid, Headers, Connection, Channel, QueueNameBin);
+    
     UnexpectedMsg -> 
       lager:error("Unexpected message: ~p", [UnexpectedMsg]),
       loop(ParentPid, Headers, Connection, Channel, QueueNameBin)
+  
   after SubscriberTimeout ->
     lager:warning("No message received for Queue ~p for ~p seconds", [binary_to_list(QueueNameBin), SubscriberTimeout / 1000]),
     lager:warning("Process mailbox size is ~p", [process_info(self(), message_queue_len)]),
@@ -110,9 +132,14 @@ get_rabbit_conn_and_channel() ->
   RabbitHost = publish_proto_config:get(broker_address),
   {ok, Connection} = amqp_connection:start(#amqp_params_network{host=RabbitHost}),
   {ok, Channel} = amqp_connection:open_channel(Connection),
-  process_flag(trap_exit, true),
-  link(Connection),
-  link(Channel),
+  case publish_proto_config:get(monitor_conn_chnl) of
+    true ->
+      process_flag(trap_exit, true),
+      link(Connection),
+      link(Channel);
+    false ->
+      false
+  end,
   {Connection, Channel}.
 
 %%%
@@ -165,4 +192,10 @@ exchange_declare(Channel) ->
   ExchangeDeclare = #'exchange.declare'{exchange = ExchangeNameBin, type = <<"headers">>, durable = true},
   #'exchange.declare_ok'{} = amqp_channel:call(Channel, ExchangeDeclare),
   ExchangeNameBin.
+
+record_pub_delivery_latency(TimeSentBin, ParentPid) ->
+  TimeSent = binary_to_term(TimeSentBin),
+  TransitTimeMillis = timer:now_diff(now(), TimeSent) / 1000,
+  ParentPid ! {record_stats, TransitTimeMillis},
+  ok.
 

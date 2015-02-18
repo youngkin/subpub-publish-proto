@@ -12,6 +12,10 @@
 %% API
 -export([get/1]).
 
+%%
+%% TODO: Change to a proplists implementation?
+%%
+
 get(Key) ->
   case Key of
     broker_address ->
@@ -25,6 +29,12 @@ get(Key) ->
     publishing_pool_size ->
       {ok, PoolSize} = application:get_env(publish_proto, publishing_pool_size),
       PoolSize;
+    delayed_ack ->
+      {ok, DelayedAck} = application:get_env(publish_proto, delayed_ack),
+      DelayedAck;
+    monitor_conn_chnl ->
+      {ok, MonitorConnChannel} = application:get_env(publish_proto, monitor_conn_chnl),
+      MonitorConnChannel;
     inter_publish_pause_millis ->
       {ok, PauseInMillis} = application:get_env(publish_proto, inter_publish_pause_millis),
       PauseInMillis;

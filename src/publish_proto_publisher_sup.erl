@@ -7,7 +7,7 @@
 %%% @end
 %%% Created : 19. Jan 2015 9:44 AM
 %%%-------------------------------------------------------------------
--module(publish_proto_publish_sup).
+-module(publish_proto_publisher_sup).
 -author("uyounri").
 
 -behaviour(supervisor).
@@ -47,7 +47,7 @@ init([]) ->
   MaxRestartSeconds = 10,
   SupervisorStrategy = {RestartStrategy, MaxRestarts, MaxRestartSeconds},
   
-  PublishingPool = ?CHILD(publish_proto_publish_pool, worker),
+  PublishingPool = ?CHILD(publish_proto_publisher_pool, worker),
   {ok, {SupervisorStrategy, [PublishingPool]}}.
 
 %%%===================================================================
