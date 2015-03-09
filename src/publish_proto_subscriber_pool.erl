@@ -25,7 +25,7 @@
 -define(SERVER, ?MODULE).
 -define(PUBLISH_STATS_DELAY, 30000). %% 30 seconds
 
--record(state, {subscriber_pids = [], headers = [], transit_duration_list = []}).
+-record(state, {subscriber_pids = [], headers = [], transit_duration_list = [], subscriber_registry}).
 
 %%%===================================================================
 %%% API
@@ -50,20 +50,22 @@ start_link() ->
 
 init([]) ->
   erlang:send_after(?PUBLISH_STATS_DELAY, self(), publish_stats),
-  {ok, #state{subscriber_pids = []}}.
+  {ok, #state{subscriber_registry = dict:new()}}.
 
 %%
 %% handle_call
 %%
-handle_call(start, _From, _State) ->
+handle_call(start, _From, #state{subscriber_registry = SubscriberRegistry} = State) ->
   Headers = publish_proto_config:get(subscriber_headers),
-  SubscriberPids = start_subscribers(Headers),
+  {SubscriberPids, NewSubscriberRegistry} = start_subscribers(Headers, SubscriberRegistry),
   lager:info("Started Subscribers, Pids = ~p", [SubscriberPids]),
-  {reply, ok, #state{subscriber_pids = SubscriberPids}};
+  {reply, ok, State#state{subscriber_pids = SubscriberPids, subscriber_registry = NewSubscriberRegistry}};
+
 handle_call(stop, _From, #state{subscriber_pids = SubscriberPids} = _State) ->
   stop_subscribers(SubscriberPids),
   lager:info("Stopped Subscribers, Pids = ~p", [SubscriberPids]),
-  {reply, ok, #state{subscriber_pids = []}};
+  {reply, ok, #state{subscriber_pids = [], subscriber_registry = dict:new()}};
+
 handle_call(_Request, _From, State) ->
   lager:warning("Unknown call: ~p", [_Request]),
   {reply, ok, State}.
@@ -78,10 +80,7 @@ handle_cast(Request, State) ->
 %%
 %% handle_info
 %%
-handle_info(publish_stats, State) ->
-  SubscriberPids = State#state.subscriber_pids,
-  Headers = State#state.headers,
-  TransitTimeDurationList = State#state.transit_duration_list,
+handle_info(publish_stats, #state{transit_duration_list = TransitTimeDurationList} = State) ->
   case length(TransitTimeDurationList) of
     0 ->
       AvgTransitTime = 0,
@@ -96,25 +95,42 @@ handle_info(publish_stats, State) ->
   end,
   lager:info("Message transit time stats (in millis): Min = ~p, Max = ~p, Median = ~p, Avg = ~p",
     [MinTransitTime, MaxTransitTime, MedianTransitTime, AvgTransitTime]),
-  NewState = #state{subscriber_pids = SubscriberPids, headers = Headers,
-    transit_duration_list = []},
   erlang:send_after(?PUBLISH_STATS_DELAY, self(), publish_stats),
-  {noreply, NewState };
+  {noreply, State#state{transit_duration_list = []} };
 
-handle_info({record_stats, TransitDurationMillis}, State) ->
-  SubscriberPids = State#state.subscriber_pids,
-  Headers = State#state.headers,
+handle_info({record_stats, TransitDurationMillis}, #state{transit_duration_list = TransitTimeDurationList} = State) ->
   TransitTimeDurationList = State#state.transit_duration_list,
   NewTransitDurationList = [TransitDurationMillis | TransitTimeDurationList],
-  {noreply, #state{subscriber_pids = SubscriberPids, headers = Headers,
-    transit_duration_list = NewTransitDurationList} };
+  {noreply, State#state{transit_duration_list = NewTransitDurationList} };
 
-handle_info({'EXIT', _Pid, killed}, State) ->
-  lager:warning("Subscriber worked killed"),
-  {noreply, State};
-handle_info({'EXIT', _Pid, Reason}, State) ->
-  lager:warning("Subscriber worker exited for Reason ~p", [Reason]),
-  {noreply, State};
+handle_info({'EXIT', SubscriberPid, killed},
+    #state{subscriber_pids = SubscriberPids, subscriber_registry = SubscriberRegistry} = State) ->
+  lager:warning("Subscriber worker (PID: ~p) killed and no longer active", [SubscriberPid]),
+  {NewSubscriberPids, NewSubscriberRegistry} = remove_subscriber_data(SubscriberPid, SubscriberPids, SubscriberRegistry),
+  {noreply, State#state{subscriber_pids = NewSubscriberPids, subscriber_registry = NewSubscriberRegistry}};
+
+handle_info({'EXIT', SubscriberPid, normal},
+    #state{subscriber_pids = SubscriberPids, subscriber_registry = SubscriberRegistry} = State) ->
+  lager:warning("Subscriber worker (PID: ~p) exited normally and no longer active", [SubscriberPid]),
+  {NewSubscriberPids, NewSubscriberRegistry} = remove_subscriber_data(SubscriberPid, SubscriberPids, SubscriberRegistry),
+  {noreply, State#state{subscriber_pids = NewSubscriberPids, subscriber_registry = NewSubscriberRegistry}};
+
+handle_info({'EXIT', SubscriberPid, Reason}, #state{subscriber_pids = SubscriberPids, subscriber_registry = SubscriberRegistry} = State) ->
+  lager:warning("Subscriber worker (PID: ~p) exited unexpectedly for Reason ~p. It will be restarted", [SubscriberPid, Reason]),
+  NewState = case dict:find(SubscriberPid, SubscriberRegistry) of
+               error -> 
+                 lager:error("No record for Subscriber worker (PID: ~p) found in subscriber registry, subscriber not restarted", 
+                   [SubscriberPid]),
+                 State;
+               SubscriptionHeader ->
+                 {NewSubscriberPids, NewSubscriberRegistry} =
+                   remove_subscriber_data(SubscriberPid, SubscriberPids, SubscriberRegistry),
+                 {NewestSubscriberPids, NewestSubscriberRegistry} = 
+                   restart_subscription(NewSubscriberPids, NewSubscriberRegistry, SubscriptionHeader),
+                 State#state{subscriber_pids = NewestSubscriberPids, subscriber_registry = NewestSubscriberRegistry}
+             end,
+  {noreply, NewState};
+
 handle_info(Info, State) ->
   lager:warning("Unknown info message: ~p", [Info]),
   {noreply, State}.
@@ -130,16 +146,17 @@ code_change(_OldVsn, State, _Extra) ->
 %%% Internal functions
 %%%===================================================================
 
-start_subscribers(Headers) ->
-  start_subscribers(Headers, []).
+start_subscribers(Headers, SubscriberRegistry) ->
+  start_subscribers(Headers, SubscriberRegistry, []).
 
-start_subscribers([], SubscriberPids) -> SubscriberPids;
-start_subscribers([Header | RemainingHeaders], SubscriberPids) ->
+start_subscribers([], SubscriberRegistry, SubscriberPids) -> {SubscriberPids, SubscriberRegistry};
+start_subscribers([Header | RemainingHeaders], SubscriberRegistry, SubscriberPids) ->
   Empty = 0,
-  Pid = spawn_link(publish_proto_subscriber_worker, loop, [self(), Header, Empty, Empty, Empty]),
   process_flag(trap_exit, true),
+  Pid = spawn_link(publish_proto_subscriber_worker, loop, [self(), Header, Empty, Empty, Empty]),
+  NewSubscriberRegistry = dict:store(Pid,Header, SubscriberRegistry),
   Pid ! start,
-  start_subscribers(RemainingHeaders, [Pid | SubscriberPids]).
+  start_subscribers(RemainingHeaders, NewSubscriberRegistry, [Pid | SubscriberPids]).
 
 stop_subscribers([]) -> ok;
 stop_subscribers([Pid | RemainingPids]) ->
@@ -170,3 +187,23 @@ calc_time_median(PubDurationsList) ->
              lists:nth(MedianPosition, SortedList)
          end
   end.
+
+%% TODO: fix type error for dict(pid(), nonempty_string())
+%% -spec remove_subscriber_data(SubscriberPid :: pid(), SubscriberPids :: [pid()], 
+%%     SubscriberRegistry :: dict(pid(), nonempty_string())) -> tuple().
+remove_subscriber_data(SubscriberPid, SubscriberPids, SubscriberRegistry) ->
+  NewSubscriberPids = lists:delete(SubscriberPid, SubscriberPids),
+  case dict:find(SubscriberPid, SubscriberRegistry) of
+    error ->
+      lager:warning("SubscriberPid (~p) not found in SubscriberRegistry", [SubscriberPid]);
+    _ ->
+      lager:info("SubscriberPid (~p) will be removed from SubscriberRegistry", [SubscriberPid])
+  end,
+  NewSubscriberRegistry = dict:erase(SubscriberPid, SubscriberRegistry),
+  {NewSubscriberPids, NewSubscriberRegistry}.
+
+restart_subscription(SubscriberPids, SubscriberRegistry, SubscriptionHeader) ->
+  {NewSubscriberPids, NewSubscriberRegistry} = 
+    start_subscribers([SubscriptionHeader], SubscriberRegistry, SubscriberPids),
+  {NewSubscriberPids, NewSubscriberRegistry}.
+

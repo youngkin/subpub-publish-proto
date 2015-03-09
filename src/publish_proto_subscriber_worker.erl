@@ -60,20 +60,28 @@ loop(ParentPid, Headers, Connection, Channel, QueueNameBin) ->
           amqp_channel:call(Channel,#'basic.ack'{delivery_tag=DeliveryTag}),
           loop(ParentPid, Headers, Connection, Channel, QueueNameBin);
         N when is_integer(N), N > 0 ->
-          timer:sleep(5000), %% give the 'EXIT' time to be queued before ack_delivery
           self() ! {ack_delivery, Channel, DeliveryTag},
           loop(ParentPid, Headers, Connection, Channel, QueueNameBin)
       end;
 
     {ack_delivery, ChannelPid, ProvidedDeliveryTag} ->
       timer:sleep(publish_proto_config:get(delayed_ack)),
-      amqp_channel:call(ChannelPid,#'basic.ack'{delivery_tag=ProvidedDeliveryTag}),
-      loop(ParentPid, Headers, Connection, Channel, QueueNameBin);
+      try
+        amqp_channel:call(ChannelPid,#'basic.ack'{delivery_tag=ProvidedDeliveryTag})
+      catch
+        Error:Reason -> 
+          lager:warning("Unexpected Error <~p>, for Reason <~p>, caught ack-ing a message for delivery tag <~p>", 
+            [Error, Reason, ProvidedDeliveryTag])
+%%           self() ! stop
+      after
+        loop(ParentPid, Headers, Connection, Channel, QueueNameBin)
+      end;
     
     {'EXIT', What, Reason} ->
-      lager:error("Connection or Channel exited (~p), this subscriber is terminating for ~p", [What, Reason]),
-      self() ! stop,
-      loop(ParentPid, Headers, Connection, Channel, QueueNameBin);
+      lager:error("Connection or Channel exited (~p), this subscriber is being restarted for ~p", [What, Reason]),
+      {NewHeaders, NewConnection, NewChannel, NewQueueNameBin} = subscribe(Headers),
+%%       self() ! stop,
+      loop(ParentPid, NewHeaders, NewConnection, NewChannel, NewQueueNameBin);
     
     UnexpectedMsg -> 
       lager:error("Unexpected message: ~p", [UnexpectedMsg]),
@@ -119,11 +127,16 @@ unsubscribe(Connection, Channel, QueueNameBin) ->
       lager:warning("UNSUBSCRIBE: No subscription found"),
       ok;
     _ -> 
-      Delete = #'queue.delete'{queue = QueueNameBin},
-      #'queue.delete_ok'{} = amqp_channel:call(Channel, Delete),
-      lager:info("UNSUBSCRIBE: Queue=~p", [QueueNameBin]),
-      amqp_channel:close(Channel),
-      amqp_connection:close(Connection),
+      try
+        lager:info("UNSUBSCRIBE: Queue=~p", [QueueNameBin]),
+        Delete = #'queue.delete'{queue = QueueNameBin},
+        #'queue.delete_ok'{} = amqp_channel:call(Channel, Delete),
+        amqp_channel:close(Channel),
+        amqp_connection:close(Connection)
+      catch
+        %% not important that an exception occurred since this is just a best effort
+        _:_ -> lager:warning("Unexpected exception caught unsubscribing from a queue") 
+      end,
       ok
   end.
 
