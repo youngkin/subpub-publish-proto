@@ -15,7 +15,13 @@
 -define(SERVER, ?MODULE).
 
 %% Helper macro for declaring children of supervisor
--define(CHILD(I, Type), {I, {I, start_link, []}, permanent, 5000, Type, [I]}).
+%% "infinity" used as the SHUTDOWN value so that the sub-supervisors
+%% have time to exit (this is the recommendation from the OTP supervisor
+%% documentation). The exception to this is the TestDriver which I'm choosing
+%% to ignore for now. It's OK in this case as its terminate/2 function doesn't
+%% do anything.
+-define(CHILD(I, Type), {I, {I, start_link, []}, permanent, infinity, Type, 
+  [I]}).
 
 %% API
 -export([start_link/0]).

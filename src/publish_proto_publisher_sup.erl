@@ -43,8 +43,8 @@ start_link() ->
   {error, Reason :: term()}).
 init([]) ->
   RestartStrategy = rest_for_one,
-  MaxRestarts = 5,
-  MaxRestartSeconds = 10,
+  MaxRestarts = 0,
+  MaxRestartSeconds = 1,
   SupervisorStrategy = {RestartStrategy, MaxRestarts, MaxRestartSeconds},
   
   PublishingPool = ?CHILD(publish_proto_publisher_pool, worker),

@@ -14,25 +14,34 @@
 %%%                                          |
 %%%                            ________________________________
 %%%                            |                               |
-%%%                     pub_proto_pub_sup               pub_proto_sub_sup
+%%%                     pub_proto_pub_sup            pub_proto_subscriber_sup
 %%%                            |                               |
-%%%                     ___________________              _________________
-%%%                     |                  |             |                |
-%%%                  *_publish       *_pub*_worker   *sub*_pool      *sub_worker
+%%%                publish_proto_publisher_pool    publish_proto_subscriber_pool
+%%%                            |                               |
+%%%                      *_pub*_worker(s)           publish_proto_subscriber_pool
+%%%                                                            |
+%%%                                               publish_proto_subscriber_worker_sup
+%%%                                                            |
+%%%                                            publish_proto_subscriber_worker_server(s)
+%%%
 %%%
 %%%         Going from left-to-right at the lowest (supervised gen_server)
 %%%         level:
-%%%             -   *publish is actually publish_proto_publish. It is an
-%%%                 TODO it's going to be the publishing pool supervisor
-%%%             -   *_pub*_worker is publish_proto_publisher_worker. It
-%%%                 TODO it's going to be one of the pool workers managed
-%%%                 by publish_proto_publish.
-%%%             _   *sub*_pool is actually publish_proto_subscriber_pool. 
-%%%                 It manages the pool of publish_proto_subscriber_worker
-%%%                 gen_servers.
-%%%             -   *sub_worker is actually publish_proto_subscriber_worker.
-%%%                 It does the actual work of creating/subscribing to a queue
-%%%                 including all the RabbitMQ callbacks.
+%%%             -   *_pub*_worker(s) is publish_proto_publisher_worker. It
+%%%                 is managed by by publish_proto_publisher_pool.
+%%%             _   publish_proto_subscriber_pool (indirectly, via publish_proto_subscriber_worker_sup)
+%%%                 manages the pool of publish_proto_subscriber_worker_server gen_servers.
+%%%             -   publish_proto_subscriber_worker_server does the actual work of creating/subscribing 
+%%%                 to a queue including all the RabbitMQ callbacks.
+%%%
+%%%         publish_proto_subscriber_worker_sup has a little bit more complex a role than described
+%%%         above. It is used by publish_proto_subscriber_pool to create, via start_child/n, 
+%%%         all the publish_proto_subscriber_worker_servers(s) specified in the configuration 
+%%%         (see priv/publish_proto.config). This is done for 2 reasons:
+%%%           1. So that publish_proto_subscriber_worker_server(s) can be created with arguments
+%%%              (i.e, the subscription details).
+%%%           2. So that publish_proto_subscriber_worker_sup can restart them automatically,
+%%%              with the correct arguments, if they fail (e.g., because a RabbitMQ connection fails).
 %%%
 %%% @end
 %%% Created : 20. Jan 2015 8:04 PM

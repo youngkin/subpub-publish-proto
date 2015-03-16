@@ -35,11 +35,13 @@ start_link() ->
 %%%===================================================================
 
 init([]) ->
-  RestartStrategy = one_for_one,
-  MaxRestarts = 5,
-  MaxRestartSeconds = 10,
+  %% No restarts, but if there were, all would be restarted together
+  RestartStrategy = one_for_all,
+  MaxRestarts = 0,
+  MaxRestartSeconds = 1,
   SupervisorFlags = {RestartStrategy, MaxRestarts, MaxRestartSeconds},
+  SubSupervisor = ?CHILD(publish_proto_subscriber_worker_sup, supervisor),
   SubPool = ?CHILD(publish_proto_subscriber_pool, worker),
-  {ok, {SupervisorFlags, [SubPool]}}.
+  {ok, {SupervisorFlags, [SubSupervisor, SubPool]}}.
 
 
