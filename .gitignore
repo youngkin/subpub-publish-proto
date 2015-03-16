@@ -13,6 +13,7 @@ deps/meck/
 deps/netlink/
 deps/recon/
 .rebar
+.idea
 _rel/*
 ebin/*
 ebin-erlang/*
