@@ -43,7 +43,7 @@ start_test() ->
   ok.
 
 stop_test() ->
-  gen_server:call(?MODULE, stop_test),
+  gen_server:call(?MODULE, stop_test, 10000),
   ok.
 
 start_link() ->

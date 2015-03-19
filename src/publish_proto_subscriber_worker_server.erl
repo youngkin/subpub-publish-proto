@@ -15,7 +15,7 @@
 -behaviour(gen_server).
 
 %% API
--export([start_link/2]).
+-export([start_link/3]).
 
 %% gen_server callbacks
 -export([init/1,
@@ -33,24 +33,24 @@
 %%% API
 %%%===================================================================
 
-start_link(SubHeader, StatsProcess) ->
+start_link(SubHeader, StatsProcess, SubId) ->
   %%
   %% Using start_link/3 to create an anonymous (i.e., unregistered) gen_server
   %%
-  gen_server:start_link(?MODULE, [SubHeader, StatsProcess], []).
+  gen_server:start_link(?MODULE, [SubHeader, StatsProcess, SubId], []).
 
 %%%===================================================================
 %%% gen_server callbacks
 %%%===================================================================
 
-init([SubHeader, StatsProcess]) ->
+init([SubHeader, StatsProcess, SubId]) ->
   %% TODO: Is this correct?
   %% To know when the parent (supervisor) shuts down. 
   %% Needed in order for terminate/2 to get called if supervisor sends a 
   %% shutdown message.
-  %% process_flag(trap_exit, true),
+  process_flag(trap_exit, true),
   lager:info("Starting Subscriber Working for Subscription(~p)", [SubHeader]),
-  {Connection, Channel, QueueNameBin} = subscribe(SubHeader),
+  {Connection, Channel, QueueNameBin} = subscribe(SubHeader, SubId),
   {ok, #state{subscription_header = SubHeader, stats_process = StatsProcess,
               connection = Connection, channel = Channel, queue_name_bin = QueueNameBin}}.
 
@@ -111,9 +111,10 @@ handle_info({#'basic.deliver'{delivery_tag=DeliveryTag}, Content},
 %% handle_info for anything not matching the above
 %%
 handle_info(Reason, State) ->
-  lager:warning("handle_info/2 called for Reason(~p) and State(~p). This
+  lager:warning("handle_info/2 called for Reason(~p) and State(~p). This 
   subscriber is terminating", [Reason, State]),
-    {noreply, State}.
+  exit(abnormal),
+  {noreply, State}.
 
 %%
 %% Called if parent (i.e., supervisor) exits, or if the supervisor directs it to stop. 
@@ -133,11 +134,11 @@ code_change(_OldVsn, State, _Extra) ->
 %%% Internal functions
 %%%===================================================================
 
-subscribe(Headers) ->
+subscribe(Headers, SubId) ->
   {Connection, Channel} = get_rabbit_conn_and_channel(),
   basic_qos_declare(Channel),
   ExchangeNameBin = exchange_declare(Channel),
-  QueueNameBin = queue_declare(Channel),
+  QueueNameBin = queue_declare(Channel, SubId),
   queue_bind(QueueNameBin, ExchangeNameBin, Channel, Headers),
   subscription_declare(QueueNameBin, Channel),
   lager:info("SUBSCRIBE: Queue=~p; Headers=~p", [QueueNameBin, Headers]),
@@ -152,12 +153,18 @@ unsubscribe(Connection, Channel, QueueNameBin) ->
       try
         lager:info("UNSUBSCRIBE: Queue=~p", [QueueNameBin]),
         Delete = #'queue.delete'{queue = QueueNameBin},
+        lager:info("Before queue delete: Queue=~p", [QueueNameBin]),
         #'queue.delete_ok'{} = amqp_channel:call(Channel, Delete),
+        lager:info("Before channel close"),
         amqp_channel:close(Channel),
-        amqp_connection:close(Connection)
+        lager:info("Before connection close"),
+        amqp_connection:close(Connection),
+        lager:info("UNSUBSCRIBE completed")
       catch
         %% not important that an exception occurred since this is just a best effort
-        _:_ -> lager:warning("Unexpected exception caught unsubscribing from a queue")
+        Error:Reason -> lager:warning("Unexpected exception caught
+        unsubscribing 
+        from a queue for Error:<<~p>> and Reason:<<~p", [Error, Reason])
       end,
       ok
   end.
@@ -213,10 +220,10 @@ queue_bind(QueueNameBin, ExchangeNameBin, Channel, Headers) ->
 %%% Registers a name for queue that will be used later to bind headers for the queue
 %%% and declare the callback process (this one) for message delivery.
 %%%
-queue_declare(Channel) ->
+queue_declare(Channel, SubId) ->
 %%   QueueName = "publish_proto_queue",
   Prefix = "pub_proto_",
-  QueueName = string:concat(Prefix, pid_to_list(self())),
+  QueueName = string:concat(Prefix, SubId),
   QueueNameBin = list_to_binary(QueueName),
   QueueDeclare = #'queue.declare'{queue = QueueNameBin, durable = true},
   #'queue.declare_ok'{queue = _QueueId} = amqp_channel:call(Channel, QueueDeclare),

@@ -162,10 +162,13 @@ code_change(_OldVsn, State, _Extra) ->
 %%%===================================================================
 
 start_subscribers(Headers, SubscriberRegistry) ->
-  start_subscribers(Headers, SubscriberRegistry,  []).
+  SubId = 0, % this is the starting point for identifying subscriptions.
+  start_subscribers(Headers, SubscriberRegistry, SubId, []).
 
-start_subscribers([], SubscriberRegistry, SubscriberPids) -> {SubscriberPids, SubscriberRegistry};
-start_subscribers([Header | RemainingHeaders], SubscriberRegistry, SubscriberPids) ->
+start_subscribers([], SubscriberRegistry, _SubId, SubscriberPids) -> 
+  {SubscriberPids, SubscriberRegistry};
+start_subscribers([Header | RemainingHeaders], SubscriberRegistry, 
+    SubId, SubscriberPids) ->
 %%
 %% Pre-supervised implementation
 %%  
@@ -177,10 +180,11 @@ start_subscribers([Header | RemainingHeaders], SubscriberRegistry, SubscriberPid
   %%
   %% Using the new, supervised, implementation replacing the above implementation
   %%
-  Pid = supervisor:start_child(publish_proto_subscriber_worker_sup, [Header, 
-    self()]),
+  {ok, Pid} = supervisor:start_child(publish_proto_subscriber_worker_sup,
+    [Header, self(), integer_to_list(SubId)]),
   NewSubscriberRegistry = dict:store(Pid,Header, SubscriberRegistry),
-  start_subscribers(RemainingHeaders, NewSubscriberRegistry, [Pid | SubscriberPids]).
+  start_subscribers(RemainingHeaders, NewSubscriberRegistry, SubId + 1, [Pid |
+  SubscriberPids]).
 
 stop_subscribers([]) -> ok;
 stop_subscribers([Pid | RemainingPids]) ->
@@ -193,7 +197,8 @@ stop_subscribers([Pid | RemainingPids]) ->
   %%
   %% New, supervised, solution
   %%
-  supervisor:terminate_child(publish_proto_subscriber_worker_sup, Pid),
+  Result = supervisor:terminate_child(publish_proto_subscriber_worker_sup, Pid),
+  lager:info("supervisor:terminate_child(~p) Result: ~p", [Pid, Result]),
   stop_subscribers(RemainingPids).
 
 calc_time_avg(PubDurationsList) ->
