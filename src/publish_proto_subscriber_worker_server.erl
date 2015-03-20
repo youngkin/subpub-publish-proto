@@ -176,14 +176,8 @@ get_rabbit_conn_and_channel() ->
   {ok, Channel} = amqp_connection:open_channel(Connection),
   case publish_proto_config:get(monitor_conn_chnl) of
     true ->
-      %%
-      %% Don't trap_exit since with this new, supervised, implementation we want
-      %% a hard-crash to trigger the supervisor restart process. We still 
-      %% link so we get the exit(kill) that is needed for the hard-crash.
-      %%
-%%       process_flag(trap_exit, true),
-      link(Connection),
-      link(Channel);
+      link(Connection);
+%%       link(Channel);
     false ->
       false
   end,
